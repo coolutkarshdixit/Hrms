@@ -1,0 +1,58 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} UI Tables {% endblock %}
+
+<!-- Specific Page CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title">Monthly Work Day Detail List</h4>
+                    <p class="card-category">Here is all Details</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive"> 
+                        <table class="table">
+                            <thead class=" text-primary">
+                                <th>Month</th>
+                                <th>Total Pay</th>
+                                <th>Leave Taken</th>
+                                <th>Weekend</th>
+                                <th>Payable</th>
+                                <th>L.W.D</th>
+                                <th>Action</th>
+                            </thead>
+                            <tbody>
+                                <tr>  
+                                    <td class="text-primary"></td>
+                                    <td class="text-primary"></td>
+                                    <td class="text-primary"></td>
+                                    <td class="text-primary"></td>
+                                    <td class="text-primary"></td>
+                                    <td class="text-primary"></td>
+                                    <td class="text-primary">
+                                        <a href="employee_update_list/" class="btn btn-primary btn-link btn-sm" rel="tooltip" title="Edit Task">
+                                            Update <i class="material-icons">edit</i>
+                                        </a>
+                                    </td>
+                                </tr>                              
+                                <tr>
+                                    <td colspan="6" class="text-center">.</td>
+                                </tr>       
+                            </tbody>
+                        </table>
+                        {% comment %} <div class="button" style="float:left" >
+                            <button type="update"  class="btn btn-primary pull-right">Generate</button>
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE -->
+{% block javascripts %}{% endblock javascripts %}

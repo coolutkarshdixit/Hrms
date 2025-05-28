@@ -1,0 +1,241 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+ 
+<div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header card-header-primary">
+          <h4 class="card-title">Add Monthly Workdays </h4>
+          <p class="card-category">Add Monthly Workdays Details </p>
+        </div>
+        <div class="card-body">
+          <form class="forms-sample" action="add_workday_data" method="post">
+              {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating" style="margin-left:95px" > Month </label>
+                  <input type="month" class="form-control"  name="month"  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating" style="margin-left:95px" >Total Days</label>
+                  <input type="number"  class="form-control"  name="total_days"  >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Employee Id </label>
+                  <input type="text" class="form-control"  name="employee_id"  id="employee_id"  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Employee Name</label>
+                  <input type="text" class="form-control"  name="employee_name"  id="employee_name" >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Leave Taken </label>
+                  <input type="number" class="form-control"  name="leave"  id="leave"  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Weekends</label>
+                  <input type="number" class="form-control"  name="weekends"  id="weekends" >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Parity Off</label>
+                  <input type="number" class="form-control"  name="parity_off"  id="parity_off" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Leave without Pay</label>
+                  <input type="number" class="form-control"  name="leave_without_pay"  id="leave_without_pay" >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Workdays</label>
+                  <input type="number" class="form-control"  name="workdays" id="workdays" readonly >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Payable Days</label>
+                  <input type="number" class="form-control"  name="payable_days"  id="payable_days" readonly  >
+                </div>
+              </div>
+            </div>
+            {% comment %} <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Workdays</label>
+                  <input type="number" class="form-control" name="workdays" id="workdays" readonly>
+                </div>
+              </div>
+            </div> {% endcomment %}
+            {% comment %} <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Workdays</label>
+                <input type="number" class="form-control" name="workdays" id="net_salary" Readonly >
+              </div>
+            </div> {% endcomment %}
+            <div class="button">
+              <button type="update" class="btn btn-primary pull-right">Update</button>
+              <button type="submit" class="btn btn-primary pull-right">Submit</button>
+              <button type="cancel" class="btn btn-primary pull-right">Cancel</button>
+              <button  class="btn btn-primary pull-right" id="calculateButton" >Calculate</button>
+            </div>
+            <div class="clearfix"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card card-profile">
+        <div class="card-avatar">
+          <a href="#pablo">
+            <img class="img" src="/static/assets/img/faces/marc.jpg" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h6 class="card-category text-gray">
+           
+          </h6>
+          <h4 class="card-title">
+           
+          </h4>
+          <p class="card-description">
+            Robert
+          </p>
+          <a href="#pablo" class="btn btn-primary btn-round">Salary Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+  const monthInput = document.querySelector('input[name="month"]');
+  const totalDaysInput = document.querySelector('input[name="total_days"]');
+  const leaveInput = document.querySelector('input[name="leave"]');
+  const weekendsInput = document.querySelector('input[name="weekends"]');
+  const parityOffInput = document.querySelector('input[name="parity_off"]');
+  const leaveWithoutPayInput = document.querySelector('input[name="leave_without_pay"]');
+  const workdaysInput = document.querySelector('input[name="workdays"]');
+  const payableDaysInput = document.querySelector('input[name="payable_days"]');
+
+  function calculateDaysInMonth(year, month) {
+    return new Date(year, month, 0).getDate(); // month is 1-based
+  }
+
+  function countSundays(year, month) {
+    let sundays = 0;
+    const daysInMonth = calculateDaysInMonth(year, month);
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month - 1, day); // month is 0-based
+      if (date.getDay() === 0) {
+        sundays++;
+      }
+    }
+    return sundays;
+  }
+
+  function countSecondAndFourthSaturdays(year, month) {
+    let saturdays = [];
+    const daysInMonth = calculateDaysInMonth(year, month);
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month - 1, day);
+      if (date.getDay() === 6) { // Saturday
+        saturdays.push(day);
+      }
+    }
+    // 2nd and 4th Saturdays
+    return (saturdays.length >= 2 ? 1 : 0) + (saturdays.length >= 4 ? 1 : 0);
+  }
+
+  function updateTotalDaysAndWeekends() {
+    const value = monthInput.value; // Format: YYYY-MM
+    if (value) {
+      const [year, month] = value.split("-").map(Number);
+
+      const totalDays = calculateDaysInMonth(year, month);
+      totalDaysInput.value = totalDays;
+
+      const sundays = countSundays(year, month);
+      const extraSaturdays = countSecondAndFourthSaturdays(year, month);
+      const weekends = sundays + extraSaturdays;
+
+      weekendsInput.value = weekends;
+
+      calculateWorkdays();
+    }
+  }
+
+  function calculateWorkdays() {
+    const totalDays = parseInt(totalDaysInput.value) || 0;
+    const leave = parseInt(leaveInput.value) || 0;
+    const weekends = parseInt(weekendsInput.value) || 0;
+    const parityOff = parseInt(parityOffInput.value) || 0;
+    const leaveWithoutPay = parseInt(leaveWithoutPayInput.value) || 0;
+
+    const workdays = totalDays - (leave + weekends + parityOff + leaveWithoutPay);
+    workdaysInput.value = workdays >= 0 ? workdays : 0;
+
+    calculatePayableDays();
+  }
+
+  function calculatePayableDays() {
+    const totalDays = parseInt(totalDaysInput.value) || 0;
+    const leaveWithoutPay = parseInt(leaveWithoutPayInput.value) || 0;
+
+    const payableDays = totalDays - leaveWithoutPay;
+    payableDaysInput.value = payableDays >= 0 ? payableDays : 0;
+  }
+
+  // Auto-calculate on month change
+  monthInput.addEventListener("change", updateTotalDaysAndWeekends);
+
+  // Recalculate when user types in related fields
+  [leaveInput, parityOffInput, leaveWithoutPayInput].forEach(input => {
+    input.addEventListener("input", calculateWorkdays);
+  });
+
+  // Auto-run on page load
+  updateTotalDaysAndWeekends();
+});
+
+
+</script>
+
+
+
+
+
+
+{% endblock javascripts %}   

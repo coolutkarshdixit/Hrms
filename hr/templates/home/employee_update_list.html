@@ -1,0 +1,163 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header card-header-primary">
+          <h4 class="card-title">Employee Profile</h4>
+          <p class="card-category">Complete your profile</p>
+        </div>
+        <div class="card-body">
+          <form  class="forms-sample" action="employee_update_list/" method="post">
+               {% csrf_token %}
+            <div class="row">
+              <div class="col-md-5">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Employee Id</label>
+                  <input type="text" class="form-control"  value="{{ current_user.id }}">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="bmd-label-floating"> First Name</label>
+                  <input type="text" class="form-control" value="{{ current_user.username }}">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Last Name</label>
+                  <input type="text" class="form-control" value="{{ current_user.email }}">
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating">Father Name</label>
+                    <input type="text" class="form-control"  value="{{ current_user.email }}" >
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating">Mother Name</label>
+                    <input type="text" class="form-control"  value="{{ current_user.email }}" >
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating">Wife Name</label>
+                    <input type="text" class="form-control"  value="{{ current_user.email }}" >
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Current Address</label>
+                  <input type="text" class="form-control"  value="{{ current_user.email }}" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Permanent Address</label>
+                  <input type="text" class="form-control"  value="{{ current_user.email }}" >
+                </div>
+              </div>
+            </div><div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Number of Kids</label>
+                  <input type="number" class="form-control"  value="{{ current_user.email }}" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating" style="margin-left:95px" >Date of Birth</label>
+                  <input type="date"  class="form-control"  value="{{ current_user.email }}" >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating" style="margin-left:95px" >Date of Joining</label>
+                    <input type="date" class="form-control"  value="{{ current_user.email }}" >
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating" style="margin-left:95px" >Marriage Anniversary Date</label>
+                    <input type="date"  class="form-control"  value="{{ current_user.email }}" >
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating">Status</label>
+                    <input type="text" class="form-control"  value="{{ current_user.email }}" >
+                  </div>
+                </div>
+              </div>
+            {% comment %} <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>About Me</label>
+                  <div class="form-group">
+                    <label class="bmd-label-floating"> Lamborghini Mercy, Your chick she so thirsty, I'm in that two seat Lambo.</label>
+                    <textarea class="form-control" rows="5"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div> {% endcomment %}
+            <button type="update" class="btn btn-primary pull-right">Update</button>
+            <button type="submit" class="btn btn-primary pull-right">Submit</button>
+            <button type="cancel" class="btn btn-primary pull-right">Cancel</button>
+            <div class="clearfix"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card card-profile">
+        <div class="card-avatar">
+          <a href="#pablo">
+            <img class="img" src="/static/assets/img/faces/marc.jpg" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h6 class="card-category text-gray">
+            {{ current_user.username }}
+          </h6>
+          <h4 class="card-title">
+            {{ current_user.email }}
+          </h4>
+          <p class="card-description">
+            Sam
+          </p>
+          <a href="#pablo" class="btn btn-primary btn-round">Profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %} 
+
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      md.initDashboardPageCharts();
+
+    });
+  </script>
+
+{% endblock javascripts %}   

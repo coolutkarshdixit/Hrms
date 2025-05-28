@@ -1,0 +1,129 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header card-header-primary">
+          <h4 class="card-title"> Finalised Monthly Work Day Detail </h4>
+          <p class="card-category">Finalised your  Work Day </p>
+        </div>
+        <div class="card-body">
+          <form class="forms-sample" action="add_details" method="post">
+              {% csrf_token %}
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="bmd-label-floating">Month</label>
+                    <select  class="form-control" name="department" style="width:100px;" >
+                      <option  name="January" >January</option>
+                      <option  name="February" >February</option>
+                      <option  name="March" >February</option>
+                      <option  name="April" >February</option>
+                      <option  name="May" >May</option>
+                      <option  name="June" >June</option>
+                      <option  name="July" >July</option>
+                      <option  name="August" >August</option>
+                      <option  name="September" >September</option>
+                      <option  name="October" >October</option>
+                      <option  name="November" >November</option>
+                      <option  name="December" >December</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="bmd-label-floating">Year</label>
+                    <input type="number" class="form-control"  name="year"  >
+                  </div>
+                </div>
+              </div>
+            {% comment %} <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Number of Kids</label>
+                  <input type="number" class="form-control"  name="no_of_kids"  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating" style="margin-left:95px" >Date of Birth</label>
+                  <input type="date"  class="form-control"  name="date_of_birth"  >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating" style="margin-left:95px" >Date of Joining</label>
+                    <input type="date" class="form-control"  name="date_of_joining" >
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating" style="margin-left:95px" >Marriage Anniversary Date</label>
+                    <input type="date"  class="form-control"  name="marriage_anniversary_date"  >
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label class="bmd-label-floating">Status</label>
+                    <select  class="form-control" name="status" style="width:100px;" >
+                      <option  name="Active" >Active</option>
+                      <option  name="Deactive" >Deactive</option>
+                    </select>
+                    <input type="text" class="form-control">
+                  </div>
+                </div>
+              </div> {% endcomment %}
+            <button type="update" class="btn btn-primary pull-right">Finalised</button>
+            {% comment %} <button type="submit" class="btn btn-primary pull-right">Submit</button>
+            <button type="cancel" class="btn btn-primary pull-right">Cancel</button> {% endcomment %}
+            <div class="clearfix"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card card-profile">
+        <div class="card-avatar">
+          <a href="#pablo">
+            <img class="img" src="/static/assets/img/faces/marc.jpg" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h6 class="card-category text-gray">
+           
+          </h6>
+          <h4 class="card-title">
+           
+          </h4>
+          <p class="card-description">
+            Payrol
+          </p>
+          <a href="#pablo" class="btn btn-primary btn-round">Profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      md.initDashboardPageCharts();
+
+    });
+  </script>
+
+{% endblock javascripts %}   

@@ -1,0 +1,239 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+ 
+<div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header card-header-primary">
+          <h4 class="card-title">Create Salary</h4>
+          <p class="card-category">Add Employee Salary Details</p>
+        </div>
+        <div class="card-body">
+          <form class="forms-sample" action="add_salary" method="post">
+              {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Employee Id</label>
+                  <input type="text" class="form-control"  name="employee_id"  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating" style="margin-left:95px" >Start Date</label>
+                  <input type="date"  class="form-control"  name="start_date"  >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Basic Pay</label>
+                  <input type="number" class="form-control"  name="basic_pay"  id="basic_pay"  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">HRA</label>
+                  <input type="number" class="form-control"  name="hra"  id="hra" >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Travel Allowance</label>
+                  <input type="number" class="form-control"  name="travel_allowance"  id="travel_allowance" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Food Allowance</label>
+                  <input type="number" class="form-control"  name="food_allowance"  id="food_allowance" >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Special Allowance</label>
+                  <input type="number" class="form-control"  name="special_allowance"  id="special_allowance" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Car Allowance</label>
+                  <input type="number" class="form-control"  name="car_allowance"  id="car_allowance" >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Petrol Allowance</label>
+                  <input type="number" class="form-control"  name="petrol_allowance"  id="petrol_allowance" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Driver Allowance</label>
+                  <input type="number" class="form-control"  name="driver_allowance" id="driver_allowance"  >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Medical Allowance</label>
+                  <input type="number" class="form-control"  name="medical_allowance"  id="medical_allowance" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Internet Allowance</label>
+                  <input type="number" class="form-control"  name="internet_allowance"  id="internet_allowance"  >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Paper Allowance</label>
+                  <input type="number" class="form-control"  name="paper_allowance"  id="paper_allowance" >
+                </div>
+              </div>
+              {% comment %} <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Permanent Address</label>
+                  <input type="text" class="form-control"  name="permanent_address"  >
+                </div>
+              </div> {% endcomment %}
+            </div>
+            <div style="text-align:center" >
+              <h4> Deduction </h4>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">EPF (Employee)</label>
+                  <input type="number" class="form-control"  name="epf"  id="epf" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Employer</label>
+                  <input type="number" class="form-control"  name="employer"  id="employer"  >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Employee Recovery</label>
+                  <input type="number" class="form-control"  name="employee_recovery"  id="employee_recovery" >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Other Deduction</label>
+                  <input type="number" class="form-control"  name="other_deduction"  id="other_deduction" >
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                {% comment %} <div class="form-group">
+                  <label class="bmd-label-floating">Employee Recovery</label>
+                  <input type="number" class="form-control"  name="employee_recovery"  >
+                </div> {% endcomment %}
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="bmd-label-floating">Total</label>
+                  <input type="number" class="form-control" name="total" id="net_salary"  >
+                </div>
+              </div>
+            </div>
+            <div class="button">
+              <button type="update" class="btn btn-primary pull-right">Update</button>
+              <button type="submit" class="btn btn-primary pull-right">Submit</button>
+              <button type="cancel" class="btn btn-primary pull-right">Cancel</button>
+              <button  class="btn btn-primary pull-right" id="calculateButton" >Calculate</button>
+            </div>
+            <div class="clearfix"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card card-profile">
+        <div class="card-avatar">
+          <a href="#pablo">
+            <img class="img" src="/static/assets/img/faces/marc.jpg" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h6 class="card-category text-gray">
+           
+          </h6>
+          <h4 class="card-title">
+           
+          </h4>
+          <p class="card-description">
+            Robert
+          </p>
+          <a href="#pablo" class="btn btn-primary btn-round">Salary Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fields = [
+      "basic_pay", "hra", "travel_allowance", "food_allowance", "special_allowance",
+      "car_allowance", "petrol_allowance", "driver_allowance", "medical_allowance",
+      "internet_allowance", "paper_allowance", "epf", "employer", "employee_recovery",
+      "other_deduction"
+    ];
+
+    function calculateTotal() {
+      let total = 0;
+      fields.forEach(field => {
+        const value = parseFloat(document.getElementById(field).value) || 0;
+        total += value;
+      });
+      document.getElementById("net_salary").value = total.toFixed(2);
+    }
+
+    // Auto-calculate on input change
+    fields.forEach(field => {
+      const inputElement = document.getElementById(field);
+      if (inputElement) {
+        inputElement.addEventListener("input", calculateTotal);
+      }
+    });
+
+    // Also calculate on button click
+    const calculateButton = document.getElementById("calculateButton");
+    if (calculateButton) {
+      calculateButton.addEventListener("click", function (event) {
+        event.preventDefault(); // prevent form submission
+        calculateTotal();
+      });
+    }
+  });
+</script>
+
+{% endblock javascripts %}   
