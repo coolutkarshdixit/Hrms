@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'employees',
+    'shared_models',
 ]
 
 # Add CORS settings if necessary

@@ -2,7 +2,7 @@ from rest_framework import generics
 from .models import Payroluser
 from .serializers import PayrolSerializer
 from django.shortcuts import render
-from .models import generate_monthly_areal_deduction, add_workday
+from shared_models.models import generate_monthly_areal_deduction, add_workday
 from fpdf import FPDF
 
 

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'hrs',
+    'shared_models',
 ]
 
 # Add CORS settings if necessary
@@ -86,16 +87,6 @@ WSGI_APPLICATION = 'hr.wsgi.application'
 # }
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'hrms',
-#         'USER': 'root',
-#         'PASSWORD': 'parity',
-#         'HOST': 'localhost',  # or the hostname where your MySQL server is running
-#         'PORT': '3306',      # or the port on which your MySQL server is listening
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -104,7 +95,7 @@ DATABASES = {
         'USER': 'root',                             # Your database user
         'PASSWORD': '',                       # Your database user password
         'HOST':'localhost',                                 # Usually localhost if running locally
-        'PORT': '3306',                             # Default MySQL/MariaDB port
+        'PORT': '3307',                             # Default MySQL/MariaDB port
     }
 }
 

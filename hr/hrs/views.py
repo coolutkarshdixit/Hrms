@@ -2,7 +2,7 @@ from rest_framework import generics
 from .models import hr
 from .serializers import hrSerializer
 from django.shortcuts import render
-from .models import new_employee,salary_add
+from shared_models.models import new_employee,salary_add
 
 
 def home(request):
