@@ -88,14 +88,15 @@ WSGI_APPLICATION = 'employee.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hrms',
-        'USER': 'django_user',
-        'PASSWORD': 'password123',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.mysql',       # Use MySQL backend for MariaDB
+        'NAME': 'hrms',                             # Your database name
+        'USER': 'root',                             # Your database user
+        'PASSWORD': '',                       # Your database user password
+        'HOST':'localhost',                                 # Usually localhost if running locally
+        'PORT': '3307',                             # Default MySQL/MariaDB port
     }
 }
+
 
 
 

@@ -17,7 +17,8 @@ Including another URLconf
 
 
 from django.urls import path
-from . import views
+from . import views 
+from .views import generate_monthly_salary, generate_monthly_registry_view
 
 
 urlpatterns = [
@@ -31,11 +32,13 @@ urlpatterns = [
     path('update_monthly_salary', views.update_monthly_salary),
     path('finalised_monthly_salary', views.finalised_monthly_salary),
     path('index', views.index),
-    path('report', views.report),
-    path('registry', views.registry),
+    # path('registry', views.registry),
     path('add_workday_data', views.add_workday_data),
     path('add_salary', views.add_salary),
-    path('registry_data', views.registry_data),
+   # urls.py
+    path("generate-monthly-salary/", views.generate_monthly_salary_view, name="generate_monthly_salary_view"),
+    path("generate-monthly-registry/", generate_monthly_registry_view, name="generate_monthly_registry")
+
     # path('export_report', views.export_report),
 
 

@@ -1,0 +1,283 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Monthly Registry {% endblock %}
+
+{% block stylesheets %}
+<style>
+  .location-heading {
+    margin-top: 50px;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgb(149, 70, 149);
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 5px;
+  }
+
+  .highlight-header {
+    background-color: rgb(161, 98, 178);
+    color: white;
+    font-weight: bold;
+  }
+
+  .employee-total {
+    background-color: #e3f2fd;
+    font-weight: bold;
+  }
+
+  .grand-total-row {
+    background-color: #ffe0b2;
+    font-weight: bold;
+  }
+
+  .table {
+    table-layout: fixed;
+    word-wrap: break-word;
+  }
+
+  .table th,
+  .table td {
+    vertical-align: middle !important;
+    text-align: center;
+    font-size: 11px;
+    white-space: normal !important;
+    word-wrap: break-word;
+    padding: 4px;
+    min-width: 80px;
+  }
+
+  table,
+  tr,
+  td,
+  th {
+    page-break-inside: avoid !important;
+  }
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Generate Monthly Salary Registry</h4>
+        <p class="card-category">Grouped by Location and Employee</p>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          {% for location, employees in grouped_data %}
+            <div class="location-heading">Location: {{ location }}</div>
+            <table class="table table-bordered table-sm location-table">
+              <thead class="highlight-header">
+                <tr>
+                  <th>Type</th><th>Employee ID</th><th>Month/Start Date</th>
+                  <th>Basic Pay</th><th>HRA</th><th>Travel Allowance</th><th>Food Allowance</th><th>Special Allowance</th><th>Car Allowance</th>
+                  <th>Petrol Allowance</th><th>Driver Allowance</th><th>Medical Allowance</th><th>Internet Allowance</th><th>Paper Allowance</th><th>EPF</th>
+                  <th>Employer</th><th>Employee Recovery</th><th>Other Deduction</th><th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in employees %}
+                  <tr><td><strong>Salary</strong></td><td>{{ row.employee_id }}</td><td>{{ row.salary.month|default:"—" }}</td>
+                    <td>{{ row.salary.basic_pay|default:"—" }}</td><td>{{ row.salary.hra|default:"—" }}</td>
+                    <td>{{ row.salary.travel_allowance|default:"—" }}</td><td>{{ row.salary.food_allowance|default:"—" }}</td>
+                    <td>{{ row.salary.special_allowance|default:"—" }}</td><td>{{ row.salary.car_allowance|default:"—" }}</td>
+                    <td>{{ row.salary.petrol_allowance|default:"—" }}</td><td>{{ row.salary.driver_allowance|default:"—" }}</td>
+                    <td>{{ row.salary.medical_allowance|default:"—" }}</td><td>{{ row.salary.internet_allowance|default:"—" }}</td>
+                    <td>{{ row.salary.paper_allowance|default:"—" }}</td><td>{{ row.salary.epf|default:"—" }}</td>
+                    <td>{{ row.salary.employer|default:"—" }}</td><td>{{ row.salary.employee_recovery|default:"—" }}</td>
+                    <td>{{ row.salary.other_deduction|default:"—" }}</td><td><strong>{{ row.salary.total|default:"—" }}</strong></td></tr>
+                  <tr><td><strong>Areal</strong></td><td>{{ row.employee_id }}</td><td>{{ row.areal.start_date|date:"Y-m"|default:"—" }}</td>
+                    <td>{{ row.areal.basic_pay|default:"—" }}</td><td>{{ row.areal.hra|default:"—" }}</td>
+                    <td>{{ row.areal.travel_allowance|default:"—" }}</td><td>{{ row.areal.food_allowance|default:"—" }}</td>
+                    <td>{{ row.areal.special_allowance|default:"—" }}</td><td>{{ row.areal.car_allowance|default:"—" }}</td>
+                    <td>{{ row.areal.petrol_allowance|default:"—" }}</td><td>{{ row.areal.driver_allowance|default:"—" }}</td>
+                    <td>{{ row.areal.medical_allowance|default:"—" }}</td><td>{{ row.areal.internet_allowance|default:"—" }}</td>
+                    <td>{{ row.areal.paper_allowance|default:"—" }}</td><td>{{ row.areal.epf|default:"—" }}</td>
+                    <td>{{ row.areal.employer|default:"—" }}</td><td>{{ row.areal.employee_recovery|default:"—" }}</td>
+                    <td>{{ row.areal.other_deduction|default:"—" }}</td><td><strong>{{ row.areal.total|default:"—" }}</strong></td></tr>
+                  <tr class="employee-total"><td><strong>Total</strong></td><td colspan="2">{{ row.employee_id }}</td>
+                    <td>{{ row.total_row.basic_pay }}</td><td>{{ row.total_row.hra }}</td><td>{{ row.total_row.travel_allowance }}</td>
+                    <td>{{ row.total_row.food_allowance }}</td><td>{{ row.total_row.special_allowance }}</td><td>{{ row.total_row.car_allowance }}</td>
+                    <td>{{ row.total_row.petrol_allowance }}</td><td>{{ row.total_row.driver_allowance }}</td><td>{{ row.total_row.medical_allowance }}</td>
+                    <td>{{ row.total_row.internet_allowance }}</td><td>{{ row.total_row.paper_allowance }}</td><td>{{ row.total_row.epf }}</td>
+                    <td>{{ row.total_row.employer }}</td><td>{{ row.total_row.employee_recovery }}</td><td>{{ row.total_row.other_deduction }}</td>
+                    <td><strong>{{ row.total_row.total }}</strong></td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endfor %}
+
+          <h4 class="text-center mt-5">Overall Grand Total (All Locations)</h4>
+          <table class="table table-bordered table-sm">
+            <thead class="highlight-header">
+              <tr>
+                <th>Total</th><th colspan="2">All Employees</th>
+                <th>Basic Pay</th><th>HRA</th><th>Travel Allowance</th><th>Food Allowance</th><th>Special Allowance</th><th>Car Allowance</th>
+                <th>Petrol Allowance</th><th>Driver Allowance</th><th>Medical Allowance</th><th>Internet Allowance</th><th>Paper Allowance</th><th>EPF</th>
+                <th>Employer</th><th>Employee Recovery</th><th>Other Deduction</th><th><strong>Total</strong></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="grand-total-row">
+                <td>Grand</td><td colspan="2">—</td>
+                <td>{{ grand_total.basic_pay }}</td><td>{{ grand_total.hra }}</td>
+                <td>{{ grand_total.travel_allowance }}</td><td>{{ grand_total.food_allowance }}</td>
+                <td>{{ grand_total.special_allowance }}</td><td>{{ grand_total.car_allowance }}</td>
+                <td>{{ grand_total.petrol_allowance }}</td><td>{{ grand_total.driver_allowance }}</td>
+                <td>{{ grand_total.medical_allowance }}</td><td>{{ grand_total.internet_allowance }}</td>
+                <td>{{ grand_total.paper_allowance }}</td><td>{{ grand_total.epf }}</td>
+                <td>{{ grand_total.employer }}</td><td>{{ grand_total.employee_recovery }}</td>
+                <td>{{ grand_total.other_deduction }}</td><td><strong>{{ grand_total.total }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="text-center mt-4 mb-3">
+            <button class="btn btn-success" onclick="exportToExcel()">Download Excel</button>
+            <button class="btn btn-danger" onclick="exportToPDF()">Download PDF</button>
+            <button class="btn btn-info" onclick="exportPayslipsPerEmployee()">Generate Payslip</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+  function addLocationTotals() {
+    document.querySelectorAll(".location-table").forEach((table) => {
+      const total = Array(19).fill(0);
+
+      table.querySelectorAll("tr.employee-total").forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        let rowTotal = 0;
+
+        cells.forEach((cell, idx) => {
+          if (idx >= 3 && idx < 18) {
+            const value = parseFloat(cell.textContent.trim()) || 0;
+            total[idx] += value;
+            rowTotal += value;
+          }
+        });
+
+        total[18] += rowTotal;
+      });
+
+      const totalRow = document.createElement("tr");
+      totalRow.classList.add("grand-total-row");
+
+      for (let i = 0; i < 19; i++) {
+        const td = document.createElement("td");
+        if (i === 0) td.textContent = "Location Total";
+        else if (i === 1) continue;
+        else if (i === 2) {
+          td.colSpan = 2;
+          td.textContent = "—";
+        } else {
+          td.textContent = total[i].toFixed(2);
+        }
+        totalRow.appendChild(td);
+      }
+
+      table.querySelector("tbody").appendChild(totalRow);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", addLocationTotals);
+
+  function exportToExcel() {
+    const tables = document.querySelectorAll(".location-table");
+    const wb = XLSX.utils.book_new();
+
+    tables.forEach((table, index) => {
+      const ws = XLSX.utils.table_to_sheet(table);
+      const locationName = table.closest('.card-body').querySelectorAll('.location-heading')[index].textContent.replace('Location: ', '');
+      XLSX.utils.book_append_sheet(wb, ws, locationName || `Location_${index + 1}`);
+    });
+
+    const dateStr = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).replace(" ", "_");
+    XLSX.writeFile(wb, `registry_${dateStr}.xlsx`);
+  }
+
+  function exportToPDF() {
+    const element = document.querySelector(".card-body");
+    const opt = {
+      margin: [0.5, 0.5, 0.5, 0.5],
+      filename: `registry_${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        scrollY: 0,
+        scrollX: 0,
+        windowWidth: document.body.scrollWidth,
+        windowHeight: document.body.scrollHeight
+      },
+      jsPDF: {
+        unit: 'in',
+        format: 'a3',
+        orientation: 'landscape'
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(element).save();
+  }
+
+  function exportPayslipsPerEmployee() {
+    const allTables = document.querySelectorAll(".location-table");
+
+    allTables.forEach((table) => {
+      const rows = table.querySelectorAll("tbody tr");
+
+      for (let i = 0; i < rows.length; i += 3) {
+        const chunk = Array.from(rows).slice(i, i + 3);
+        if (chunk.length < 3) continue;
+
+        const tempTable = document.createElement("table");
+        tempTable.className = "table table-bordered table-sm";
+        const thead = table.querySelector("thead").cloneNode(true);
+        const tbody = document.createElement("tbody");
+        chunk.forEach((row) => tbody.appendChild(row.cloneNode(true)));
+        tempTable.appendChild(thead);
+        tempTable.appendChild(tbody);
+
+        const wrapper = document.createElement("div");
+        const empId = chunk[0].children[1].textContent.trim();
+        const locationHeading = table.closest('.card-body').querySelector('.location-heading')?.textContent || '';
+        wrapper.innerHTML = `<h3>${locationHeading} - Employee ID: ${empId}</h3>`;
+        wrapper.appendChild(tempTable);
+
+        const opt = {
+          margin: 0.5,
+          filename: `payslip_${empId}_${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            scrollY: 0,
+            scrollX: 0,
+            windowWidth: document.body.scrollWidth,
+            windowHeight: document.body.scrollHeight
+          },
+          jsPDF: {
+            unit: 'in',
+            format: 'a4',
+            orientation: 'landscape'
+          }
+        };
+
+        html2pdf().set(opt).from(wrapper).save();
+      }
+    });
+  }
+</script>
+{% endblock javascripts %}

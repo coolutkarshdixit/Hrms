@@ -50,7 +50,7 @@ class new_employee(models.Model):
 
    
 class add_workday(models.Model):
-    month = models.CharField(max_length=7,  unique=True)  # Stores in 'YYYY-MM' format
+    month = models.CharField(max_length=7,  )  # Stores in 'YYYY-MM' format
     total_days = models.IntegerField()
     employee_id = models.CharField(max_length=50, unique=True)
     employee_name = models.CharField(max_length=50, unique=True)
@@ -65,6 +65,33 @@ class add_workday(models.Model):
     def __str__(self):
         return self.month
     
+
+
+class generate_monthly_salary(models.Model):
+    employee_id = models.CharField(max_length=50)
+    month = models.CharField(max_length=7)  # Format 'YYYY-MM'
+    
+    basic_pay = models.DecimalField(max_digits=10, decimal_places=2)
+    hra = models.DecimalField(max_digits=10, decimal_places=2)
+    travel_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    food_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    special_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    car_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    petrol_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    driver_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    medical_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    internet_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    paper_allowance = models.DecimalField(max_digits=10, decimal_places=2)
+    epf = models.DecimalField(max_digits=10, decimal_places=2)
+    employer = models.DecimalField(max_digits=10, decimal_places=2)
+    employee_recovery = models.DecimalField(max_digits=10, decimal_places=2)
+    other_deduction = models.DecimalField(max_digits=10, decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.employee_id} - {self.month}"
+
+
     
 
 class generate_monthly_areal_deduction(models.Model):

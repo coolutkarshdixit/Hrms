@@ -1,9 +1,28 @@
 from rest_framework import generics
 from .models import Payroluser
 from .serializers import PayrolSerializer
-from django.shortcuts import render
 from shared_models.models import generate_monthly_areal_deduction, add_workday
 from fpdf import FPDF
+from django.http import JsonResponse
+from shared_models.models import add_workday, salary_add, generate_monthly_salary, new_employee
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.db.models import Q
+from collections import defaultdict
+from decimal import Decimal
+from django.db.models import Sum
+from decimal import Decimal
+
+
+
+
+
+
+
+
+
 
 
 class PayrolListView(generics.ListCreateAPIView):
@@ -119,11 +138,203 @@ def add_salary(request):
                          "home/generate_monthly_areal_deduction.html",
                           {"msg": "Order Price Details Already Added !!"})
 
-def generate_monthly_salary(request):
-    return render (request, "home/generate_monthly_salary.html")
+# def generate_monthly_salary(request):
+#     return render (request, "home/generate_monthly_salary.html")
 
-def update_monthly_salary(request):
-    return render (request, "home/update_monthly_salary.html")
+
+# def generate_monthly_salary_view(request):
+#     months = [
+#         ("01", "January"), ("02", "February"), ("03", "March"),
+#         ("04", "April"), ("05", "May"), ("06", "June"),
+#         ("07", "July"), ("08", "August"), ("09", "September"),
+#         ("10", "October"), ("11", "November"), ("12", "December"),
+#     ]
+#     years = [str(y) for y in range(2020, 2999)]
+
+#     if request.method == "POST":
+#         month = request.POST.get("month")
+#         year = request.POST.get("year")
+#         employee_id_from = request.POST.get("employee_id_from", "").strip()
+#         employee_id_to = request.POST.get("employee_id_to", "").strip()
+#         location = request.POST.get("location", "").strip()
+
+#         filters = {}
+
+#         # Use lexicographical string comparison (for alphanumeric IDs)
+#         if employee_id_from and employee_id_to:
+#             if employee_id_from > employee_id_to:
+#                 messages.error(request, "From Employee ID cannot be greater than To Employee ID.")
+#                 return redirect("generate_monthly_salary_view")
+
+#             filters["employee_id__gte"] = employee_id_from
+#             filters["employee_id__lte"] = employee_id_to
+#         elif employee_id_from:
+#             filters["employee_id__gte"] = employee_id_from
+#         elif employee_id_to:
+#             filters["employee_id__lte"] = employee_id_to
+
+#         if location:
+#             filters["location__icontains"] = location
+
+#         salary_records = salary_add.objects.filter(**filters)
+#         if not salary_records.exists():
+#             messages.error(request, "No employees found with provided filters.")
+#             return redirect("generate_monthly_salary_view")
+
+#         month_str = f"{year}-{int(month):02d}"
+#         generated = []
+
+#         for salary in salary_records:
+#             emp_id = salary.employee_id
+#             try:
+#                 work = add_workday.objects.get(employee_id=emp_id, month=month_str)
+#                 if work.total_days == 0:
+#                     continue
+#                 ratio = work.payable_days / work.total_days
+
+#                 _, created = generate_monthly_salary.objects.update_or_create(
+#                     employee_id=emp_id,
+#                     month=month_str,
+#                     defaults={
+#                         "basic_pay": salary.basic_pay * ratio,
+#                         "hra": salary.hra * ratio,
+#                         "travel_allowance": salary.travel_allowance * ratio,
+#                         "food_allowance": salary.food_allowance * ratio,
+#                         "special_allowance": salary.special_allowance * ratio,
+#                         "car_allowance": salary.car_allowance * ratio,
+#                         "petrol_allowance": salary.petrol_allowance * ratio,
+#                         "driver_allowance": salary.driver_allowance * ratio,
+#                         "medical_allowance": salary.medical_allowance * ratio,
+#                         "internet_allowance": salary.internet_allowance * ratio,
+#                         "paper_allowance": salary.paper_allowance * ratio,
+#                         "epf": salary.epf * ratio,
+#                         "employer": salary.employer * ratio,
+#                         "employee_recovery": salary.employee_recovery * ratio,
+#                         "other_deduction": salary.other_deduction * ratio,
+#                         "total": salary.total * ratio
+#                     }
+#                 )
+#                 generated.append(emp_id)
+#             except add_workday.DoesNotExist:
+#                 messages.warning(request, f"Workday not found for Employee ID {emp_id}")
+#             except Exception as e:
+#                 messages.warning(request, f"Error for Employee ID {emp_id}: {str(e)}")
+
+#         if generated:
+#             messages.success(request, f"Salary generated for {len(generated)} employee(s).")
+#         else:
+#             messages.error(request, "No salary generated.")
+
+#         return redirect("generate_monthly_salary_view")
+
+#     return render(request, "home/generate_monthly_salary.html", {
+#         "months": months,
+#         "years": years
+#     })
+
+
+
+
+def generate_monthly_salary_view(request):
+    months = [
+        ("01", "January"), ("02", "February"), ("03", "March"),
+        ("04", "April"), ("05", "May"), ("06", "June"),
+        ("07", "July"), ("08", "August"), ("09", "September"),
+        ("10", "October"), ("11", "November"), ("12", "December"),
+    ]
+    years = [str(y) for y in range(2020, 2999)]
+
+    if request.method == "POST":
+        month = request.POST.get("month")
+        year = request.POST.get("year")
+        employee_id_from = request.POST.get("employee_id_from", "").strip()
+        employee_id_to = request.POST.get("employee_id_to", "").strip()
+        location = request.POST.get("location", "").strip()
+        department = request.POST.get("department", "").strip()
+
+        employee_filters = {}
+
+        if employee_id_from and employee_id_to:
+            if employee_id_from > employee_id_to:
+                messages.error(request, "From Employee ID cannot be greater than To Employee ID.")
+                return redirect("generate_monthly_salary_view")
+            employee_filters["employee_id__gte"] = employee_id_from
+            employee_filters["employee_id__lte"] = employee_id_to
+        elif employee_id_from:
+            employee_filters["employee_id__gte"] = employee_id_from
+        elif employee_id_to:
+            employee_filters["employee_id__lte"] = employee_id_to
+
+        if location and location != "All Locations":
+            employee_filters["location__icontains"] = location
+
+        if department:
+            employee_filters["department__icontains"] = department
+
+        # Step 1: Get filtered employee_ids from new_employee
+        employee_ids = new_employee.objects.filter(**employee_filters).values_list("employee_id", flat=True)
+
+        # Step 2: Use these IDs to get corresponding salary records
+        salary_records = salary_add.objects.filter(employee_id__in=employee_ids)
+
+        if not salary_records.exists():
+            messages.error(request, "No employees found with provided filters.")
+            return redirect("generate_monthly_salary_view")
+
+        month_str = f"{year}-{int(month):02d}"
+        generated = []
+
+        for salary in salary_records:
+            emp_id = salary.employee_id
+            try:
+                work = add_workday.objects.get(employee_id=emp_id, month=month_str)
+                if work.total_days == 0:
+                    continue
+                ratio = work.payable_days / work.total_days
+
+                _, created = generate_monthly_salary.objects.update_or_create(
+                    employee_id=emp_id,
+                    month=month_str,
+                    defaults={
+                        "basic_pay": salary.basic_pay * ratio,
+                        "hra": salary.hra * ratio,
+                        "travel_allowance": salary.travel_allowance * ratio,
+                        "food_allowance": salary.food_allowance * ratio,
+                        "special_allowance": salary.special_allowance * ratio,
+                        "car_allowance": salary.car_allowance * ratio,
+                        "petrol_allowance": salary.petrol_allowance * ratio,
+                        "driver_allowance": salary.driver_allowance * ratio,
+                        "medical_allowance": salary.medical_allowance * ratio,
+                        "internet_allowance": salary.internet_allowance * ratio,
+                        "paper_allowance": salary.paper_allowance * ratio,
+                        "epf": salary.epf * ratio,
+                        "employer": salary.employer * ratio,
+                        "employee_recovery": salary.employee_recovery * ratio,
+                        "other_deduction": salary.other_deduction * ratio,
+                        "total": salary.total * ratio
+                    }
+                )
+                generated.append(emp_id)
+            except add_workday.DoesNotExist:
+                messages.warning(request, f"Workday not found for Employee ID {emp_id}")
+            except Exception as e:
+                messages.warning(request, f"Error for Employee ID {emp_id}: {str(e)}")
+
+        if generated:
+            messages.success(request, f"Salary generated for {len(generated)} employee(s).")
+        else:
+            messages.error(request, "No salary generated.")
+
+        return redirect("generate_monthly_salary_view")
+
+    return render(request, "home/generate_monthly_salary.html", {
+        "months": months,
+        "years": years,
+        "locations": new_employee.objects.values_list("location", flat=True).distinct(),
+        "departments": new_employee.objects.values_list("department", flat=True).distinct()
+    })
+
+
 
 def update_monthly_salary(request):
     return render (request, "home/update_monthly_salary.html")
@@ -140,130 +351,166 @@ def index(request):
     context = {}
     return render(request,"index.html",context)
 
-def report(request):
-    
-    sales = [
-        {"item": "Keyboard", "amount": "$120,00"},
-        {"item": "Mouse", "amount": "$10,00"},
-        {"item": "House", "amount": "$1 000 000,00"},
+
+
+
+# def generate_monthly_registry_view(request):
+#     # Fetch salary and areal deduction records
+#     salary_qs = generate_monthly_salary.objects.all()
+#     areal_qs = generate_monthly_areal_deduction.objects.all()
+
+#     # Optionally fetch employee info (for location)
+#     employee_info = {
+#         emp.employee_id: emp for emp in new_employee.objects.all()
+#     }
+
+#     # Combine and group by location and then employee_id
+#     grouped_data = defaultdict(lambda: defaultdict(dict))
+
+#     # Salary data
+#     for sal in salary_qs:
+#         emp_id = sal.employee_id
+#         location = employee_info.get(emp_id).location if emp_id in employee_info else "Unknown"
+#         grouped_data[location][emp_id]['salary'] = sal
+
+#     # Areal data
+#     for ded in areal_qs:
+#         emp_id = ded.employee_id
+#         location = employee_info.get(emp_id).location if emp_id in employee_info else "Unknown"
+#         grouped_data[location][emp_id]['areal'] = ded
+
+#     # Structure it for the template
+#     structured_data = []
+#     for location, employees in grouped_data.items():
+#         emp_list = []
+#         for emp_id, records in employees.items():
+#             emp_list.append({
+#                 "employee_id": emp_id,
+#                 "location": location,
+#                 "salary": records.get("salary"),
+#                 "areal": records.get("areal")
+#             })
+#         structured_data.append({
+#             "location": location,
+#             "employees": emp_list
+#         })
+
+#     return render(request, "home/generate_monthly_registry.html", {
+#         "grouped_data": structured_data
+#     })
+
+
+# from decimal import Decimal
+# from django.shortcuts import render
+# from shared_models.models import generate_monthly_salary, generate_monthly_areal_deduction, new_employee
+# from collections import defaultdict
+
+# def safe_decimal(value):
+#     try:
+#         return Decimal(value or 0)
+#     except:
+#         return Decimal(0)
+
+# def generate_monthly_registry_view(request):
+#     salary_qs = generate_monthly_salary.objects.all()
+#     areal_qs = generate_monthly_areal_deduction.objects.all()
+#     employee_info = {e.employee_id: e for e in new_employee.objects.all()}
+
+#     grouped = defaultdict(list)
+
+#     # Grand totals across all locations
+#     all_location_totals = defaultdict(Decimal)
+
+#     for emp_id in set(list(salary_qs.values_list("employee_id", flat=True)) + list(areal_qs.values_list("employee_id", flat=True))):
+#         salary = salary_qs.filter(employee_id=emp_id).first()
+#         areal = areal_qs.filter(employee_id=emp_id).first()
+#         emp = employee_info.get(emp_id)
+#         location = emp.location if emp else "Unknown"
+
+#         # Per-employee totals (salary + areal)
+#         emp_total = {}
+#         keys = [
+#             "basic_pay", "hra", "travel_allowance", "food_allowance",
+#             "special_allowance", "car_allowance", "petrol_allowance",
+#             "driver_allowance", "medical_allowance", "internet_allowance",
+#             "paper_allowance", "epf", "employer", "employee_recovery",
+#             "other_deduction", "total"
+#         ]
+
+#         for key in keys:
+#             val1 = safe_decimal(getattr(salary, key, 0))
+#             val2 = safe_decimal(getattr(areal, key, 0))
+#             emp_total[key] = val1 + val2
+#             all_location_totals[key] += emp_total[key]
+
+#         grouped[location].append({
+#             "employee_id": emp_id,
+#             "salary": salary,
+#             "areal": areal,
+#             "total_row": emp_total
+#         })
+
+#     return render(request, "home/generate_monthly_registry.html", {
+#         "grouped_data": grouped.items(),
+#         "grand_total": all_location_totals,
+#     })
+from decimal import Decimal
+from django.shortcuts import render
+from shared_models.models import generate_monthly_salary, generate_monthly_areal_deduction, new_employee
+from collections import defaultdict
+
+def safe_decimal(value):
+    try:
+        return Decimal(value or 0)
+    except:
+        return Decimal(0)
+
+def generate_monthly_registry_view(request):
+    salary_qs = generate_monthly_salary.objects.all()
+    areal_qs = generate_monthly_areal_deduction.objects.all()
+    employee_info = {e.employee_id: e for e in new_employee.objects.all()}
+
+    grouped = defaultdict(list)
+    all_location_totals = defaultdict(Decimal)  # Grand total
+    location_totals = defaultdict(lambda: defaultdict(Decimal))  # Per-location totals
+
+    keys = [
+        "basic_pay", "hra", "travel_allowance", "food_allowance",
+        "special_allowance", "car_allowance", "petrol_allowance",
+        "driver_allowance", "medical_allowance", "internet_allowance",
+        "paper_allowance", "epf", "employer", "employee_recovery",
+        "other_deduction", "total"
     ]
-    pdf = FPDF('P', 'mm', 'A4')
-    pdf.add_page()
-    pdf.set_font('courier', 'B', 16)
-    pdf.cell(40, 10, 'Its a Monthly Payslip:',0,1)
-    pdf.cell(40, 10, '',0,1)
-    pdf.set_font('courier', '', 12)
-    pdf.cell(200, 8, f"{'Item'.ljust(30)} {'Amount'.rjust(20)}", 0, 1)
-    pdf.line(10, 30, 150, 30)
-    pdf.line(10, 38, 150, 38)
-    for line in sales:
-        pdf.cell(200, 8, f"{line['item'].ljust(30)} {line['amount'].rjust(20)}", 0, 1)
 
-    pdf.output('tuto1.pdf', 'F')
-    return render(request, "index.html")
-    
-def registry(request):
-    context = {}
-    return render(request,"home/registry.html",context)
-    
-# def registry_data(request):
-        
-#     sales = [
-#         {"item": "Employee_id", "amount": "$120,00" },
-#         {"item": "Start_date", "amount": "$10,00"},
-#         {"item": "Basic_pay", "amount": "$"},
-#         {"item": "Hra", "amount": "$"},
-#         {"item": "travel_allowance", "amount": "$"},
-#         {"item": "food_allowance", "amount": "$"},
-#         {"item": "special_allowance", "amount": "$"},
-#         {"item": "car_allowance", "amount": "$"},
-#         {"item": "petrol_allowance", "amount": "$"},
-#         {"item": "driver_allowance", "amount": "$"},
-#         {"item": "medical_allowance", "amount": "$"},
-#         {"item": "internet_allowance", "amount": "$"},
-#         {"item": "paper_allowance", "amount": "$"},
-#         {"item": "epf", "amount": "$"},
-#         {"item": "employer", "amount": "$"},
-#         {"item": "employee_recovery", "amount": "$"},
-#         {"item": "other_deduction", "amount": "$"},
-#         {"item": "Gross_Salary", "amount": "$"},
-        
-#     ]
-#     pdf = FPDF('L', 'mm', 'A4')
-#     pdf.add_page()
-#     pdf.set_font('courier', 'B', 16)
-#     pdf.cell(40, 10, 'Its A Monthly Salary Details Registry:',0,1)
-#     pdf.cell(40, 10, '',0,1)
-#     pdf.set_font('courier', '', 12)
-#     pdf.cell(200, 8, f"{'Item'.ljust(30)} {'Amount'.rjust(20)}", 0, 1)
-#     pdf.line(10, 30, 150, 30)
-#     pdf.line(10, 38, 150, 38)
-#     for line in sales:
-#         pdf.cell(200, 8, f"{line['item'].ljust(30)} {line['amount'].rjust(20)}", 0, 1)
+    all_employee_ids = set(salary_qs.values_list("employee_id", flat=True)) | set(areal_qs.values_list("employee_id", flat=True))
 
-#     pdf.output('tuto2.pdf', 'F')
-#     return render(request, "registry.html")
+    for emp_id in all_employee_ids:
+        salary = salary_qs.filter(employee_id=emp_id).first()
+        areal = areal_qs.filter(employee_id=emp_id).first()
+        emp = employee_info.get(emp_id)
+        location = emp.location if emp else "Unknown"
 
+        emp_total = {}
 
+        for key in keys:
+            val1 = safe_decimal(getattr(salary, key, 0))
+            val2 = safe_decimal(getattr(areal, key, 0))
+            total_val = val1 + val2
+            emp_total[key] = total_val
 
-from fpdf import FPDF
+            # Update grand and location totals
+            all_location_totals[key] += total_val
+            location_totals[location][key] += total_val
 
-def registry_data(request):
-    sales = [
-        {"item": "Employee_id", "amount": "$120,00"},
-        {"item": "Start_date", "amount": "$10,00"},
-        {"item": "Basic_pay", "amount": "$"},
-        {"item": "Hra", "amount": "$"},
-        {"item": "travel_allowance", "amount": "$"},
-        {"item": "food_allowance", "amount": "$"},
-        {"item": "special_allowance", "amount": "$"},
-        {"item": "car_allowance", "amount": "$"},
-        {"item": "petrol_allowance", "amount": "$"},
-        {"item": "driver_allowance", "amount": "$"},
-        {"item": "medical_allowance", "amount": "$"},
-        {"item": "internet_allowance", "amount": "$"},
-        {"item": "paper_allowance", "amount": "$"},
-        {"item": "epf", "amount": "$"},
-        {"item": "employer", "amount": "$"},
-        {"item": "employee_recovery", "amount": "$"},
-        {"item": "other_deduction", "amount": "$"},
-        {"item": "Gross_Salary", "amount": "$"},
-    ]
-    
-    # Create PDF in landscape format (L)
-    pdf = FPDF('L', 'mm', 'A4')
-    pdf.add_page()
-    
-    # Set the font
-    pdf.set_font('courier', 'B', 16)
-    
-    # Title at the top
-    pdf.cell(0, 10, 'Its A Monthly Salary Details Registry:', 0, 1, 'C')
-    pdf.ln(10)  # Add space after title
-    
-    # Set font for the table headers
-    pdf.set_font('courier', 'B', 12)
-    
-    # Define column widths for better spacing in landscape format
-    column_width = 30  # width of each cell (adjust as needed)
-    
-    # Loop through the sales data and create table headers
-    for line in sales:
-        pdf.cell(column_width, 8, line['item'], 1, 0, 'C')  # Header: Item
-    pdf.ln()  # Line break after header row
-    
-    # Set font for the table values
-    pdf.set_font('courier', '', 12)
-    
-    # Loop through the sales data and display the corresponding amounts
-    for line in sales:
-        pdf.cell(column_width, 8, line['amount'], 1, 0, 'C')  # Values: Amount
-    
-    # Save the PDF file
-    pdf.output('tuto2.pdf', 'F')
-    
-    return render(request, "registry.html")
+        grouped[location].append({
+            "employee_id": emp_id,
+            "salary": salary,
+            "areal": areal,
+            "total_row": emp_total
+        })
 
-
-
-
+    return render(request, "home/generate_monthly_registry.html", {
+        "grouped_data": grouped.items(),
+        "grand_total": all_location_totals,
+        "location_totals": location_totals,  # Send to template
+    })

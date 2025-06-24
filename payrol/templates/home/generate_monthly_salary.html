@@ -1,0 +1,69 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Generate Monthly Salary</h2>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" action="{% url 'generate_monthly_salary_view' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="month">Month:</label>
+            <select name="month" class="form-control" required>
+                {% for code, name in months %}
+                    <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="year">Year:</label>
+            <select name="year" class="form-control" required>
+                {% for y in years %}
+                    <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="employee_id_from">From Employee ID:</label>
+            <input type="text" name="employee_id_from" class="form-control" placeholder="Optional">
+        </div>
+
+        <div class="form-group">
+            <label for="employee_id_to">To Employee ID:</label>
+            <input type="text" name="employee_id_to" class="form-control" placeholder="Optional">
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location:</label>
+            <select name="location" class="form-control">
+                <option value="">All Locations</option>
+                {% for loc in locations %}
+                    <option value="{{ loc }}">{{ loc }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="department">Department:</label>
+            <select name="department" class="form-control">
+                <option value="">All Departments</option>
+                {% for dept in departments %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Generate Salary</button>
+    </form>
+</div>
+{% endblock %}
