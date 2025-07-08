@@ -66,7 +66,7 @@
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          {% for location, employees in grouped_data %}
+          {% for location, employees, location_total in grouped_data %}
             <div class="location-heading">Location: {{ location }}</div>
             <table class="table table-bordered table-sm location-table">
               <thead class="highlight-header">
@@ -74,7 +74,7 @@
                   <th>Type</th><th>Employee ID</th><th>Month/Start Date</th>
                   <th>Basic Pay</th><th>HRA</th><th>Travel Allowance</th><th>Food Allowance</th><th>Special Allowance</th><th>Car Allowance</th>
                   <th>Petrol Allowance</th><th>Driver Allowance</th><th>Medical Allowance</th><th>Internet Allowance</th><th>Paper Allowance</th><th>EPF</th>
-                  <th>Employer</th><th>Employee Recovery</th><th>Other Deduction</th><th>Total</th>
+                  <th>Employer</th><th>Employee Recovery</th><th>Other Deduction</th><th>Taxes</th><th>Remark</th><th>Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -87,7 +87,8 @@
                     <td>{{ row.salary.medical_allowance|default:"—" }}</td><td>{{ row.salary.internet_allowance|default:"—" }}</td>
                     <td>{{ row.salary.paper_allowance|default:"—" }}</td><td>{{ row.salary.epf|default:"—" }}</td>
                     <td>{{ row.salary.employer|default:"—" }}</td><td>{{ row.salary.employee_recovery|default:"—" }}</td>
-                    <td>{{ row.salary.other_deduction|default:"—" }}</td><td><strong>{{ row.salary.total|default:"—" }}</strong></td></tr>
+                    <td>{{ row.salary.other_deduction|default:"—" }}</td><td>{{ row.salary.taxes|default:"—" }}</td><td>{{ row.salary.remark|default:"—" }}</td>
+                    <td><strong>{{ row.salary.total|default:"—" }}</strong></td></tr>
                   <tr><td><strong>Areal</strong></td><td>{{ row.employee_id }}</td><td>{{ row.areal.start_date|date:"Y-m"|default:"—" }}</td>
                     <td>{{ row.areal.basic_pay|default:"—" }}</td><td>{{ row.areal.hra|default:"—" }}</td>
                     <td>{{ row.areal.travel_allowance|default:"—" }}</td><td>{{ row.areal.food_allowance|default:"—" }}</td>
@@ -96,19 +97,32 @@
                     <td>{{ row.areal.medical_allowance|default:"—" }}</td><td>{{ row.areal.internet_allowance|default:"—" }}</td>
                     <td>{{ row.areal.paper_allowance|default:"—" }}</td><td>{{ row.areal.epf|default:"—" }}</td>
                     <td>{{ row.areal.employer|default:"—" }}</td><td>{{ row.areal.employee_recovery|default:"—" }}</td>
-                    <td>{{ row.areal.other_deduction|default:"—" }}</td><td><strong>{{ row.areal.total|default:"—" }}</strong></td></tr>
+                    <td>{{ row.areal.other_deduction|default:"—" }}</td><td>{{ row.areal.taxes|default:"—" }}</td><td>{{ row.areal.remark|default:"—" }}</td>
+                    <td><strong>{{ row.areal.total|default:"—" }}</strong></td></tr>
                   <tr class="employee-total"><td><strong>Total</strong></td><td colspan="2">{{ row.employee_id }}</td>
                     <td>{{ row.total_row.basic_pay }}</td><td>{{ row.total_row.hra }}</td><td>{{ row.total_row.travel_allowance }}</td>
                     <td>{{ row.total_row.food_allowance }}</td><td>{{ row.total_row.special_allowance }}</td><td>{{ row.total_row.car_allowance }}</td>
                     <td>{{ row.total_row.petrol_allowance }}</td><td>{{ row.total_row.driver_allowance }}</td><td>{{ row.total_row.medical_allowance }}</td>
                     <td>{{ row.total_row.internet_allowance }}</td><td>{{ row.total_row.paper_allowance }}</td><td>{{ row.total_row.epf }}</td>
                     <td>{{ row.total_row.employer }}</td><td>{{ row.total_row.employee_recovery }}</td><td>{{ row.total_row.other_deduction }}</td>
-                    <td><strong>{{ row.total_row.total }}</strong></td></tr>
+                    <td>{{ row.total_row.taxes }}</td><td>{{ row.total_row.remark }}</td><td><strong>{{ row.total_row.total }}</strong></td></tr>
                 {% endfor %}
+
+                <!-- Location Total Row -->
+                <tr class="grand-total-row">
+                  <td><strong>Location Total</strong></td><td colspan="2">—</td>
+                  <td>{{ location_total.basic_pay }}</td><td>{{ location_total.hra }}</td><td>{{ location_total.travel_allowance }}</td>
+                  <td>{{ location_total.food_allowance }}</td><td>{{ location_total.special_allowance }}</td><td>{{ location_total.car_allowance }}</td>
+                  <td>{{ location_total.petrol_allowance }}</td><td>{{ location_total.driver_allowance }}</td><td>{{ location_total.medical_allowance }}</td>
+                  <td>{{ location_total.internet_allowance }}</td><td>{{ location_total.paper_allowance }}</td><td>{{ location_total.epf }}</td>
+                  <td>{{ location_total.employer }}</td><td>{{ location_total.employee_recovery }}</td><td>{{ location_total.other_deduction }}</td>
+                  <td>{{ location_total.taxes }}</td><td>—</td><td><strong>{{ location_total.total }}</strong></td>
+                </tr>
               </tbody>
             </table>
           {% endfor %}
 
+          <!-- Grand Total Row -->
           <h4 class="text-center mt-5">Overall Grand Total (All Locations)</h4>
           <table class="table table-bordered table-sm">
             <thead class="highlight-header">
@@ -116,7 +130,7 @@
                 <th>Total</th><th colspan="2">All Employees</th>
                 <th>Basic Pay</th><th>HRA</th><th>Travel Allowance</th><th>Food Allowance</th><th>Special Allowance</th><th>Car Allowance</th>
                 <th>Petrol Allowance</th><th>Driver Allowance</th><th>Medical Allowance</th><th>Internet Allowance</th><th>Paper Allowance</th><th>EPF</th>
-                <th>Employer</th><th>Employee Recovery</th><th>Other Deduction</th><th><strong>Total</strong></th>
+                <th>Employer</th><th>Employee Recovery</th><th>Other Deduction</th><th>Taxes</th><th>Remark</th><th><strong>Total</strong></th>
               </tr>
             </thead>
             <tbody>
@@ -129,14 +143,14 @@
                 <td>{{ grand_total.medical_allowance }}</td><td>{{ grand_total.internet_allowance }}</td>
                 <td>{{ grand_total.paper_allowance }}</td><td>{{ grand_total.epf }}</td>
                 <td>{{ grand_total.employer }}</td><td>{{ grand_total.employee_recovery }}</td>
-                <td>{{ grand_total.other_deduction }}</td><td><strong>{{ grand_total.total }}</strong></td>
+                <td>{{ grand_total.other_deduction }}</td><td>{{ grand_total.taxes }}</td><td>{{ grand_total.remark }}</td><td><strong>{{ grand_total.total }}</strong></td>
               </tr>
             </tbody>
           </table>
 
           <div class="text-center mt-4 mb-3">
-            <button class="btn btn-success" onclick="exportToExcel()">Download Excel</button>
-            <button class="btn btn-danger" onclick="exportToPDF()">Download PDF</button>
+            <button class="btn btn-success" onclick="exportToExcel()">Download All Excel</button>
+            <button class="btn btn-danger" onclick="exportToPDF()">Download All PDF</button>
             <button class="btn btn-info" onclick="exportPayslipsPerEmployee()">Generate Payslip</button>
           </div>
 
@@ -147,14 +161,16 @@
 </div>
 {% endblock content %}
 
+
+
 {% block javascripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-  function addLocationTotals() {
+  {% comment %} function addLocationTotals() {
     document.querySelectorAll(".location-table").forEach((table) => {
-      const total = Array(19).fill(0);
+      const total = Array(21).fill(0);
 
       table.querySelectorAll("tr.employee-total").forEach((row) => {
         const cells = row.querySelectorAll("td");
@@ -168,13 +184,13 @@
           }
         });
 
-        total[18] += rowTotal;
+        total[20] += rowTotal;
       });
 
       const totalRow = document.createElement("tr");
       totalRow.classList.add("grand-total-row");
 
-      for (let i = 0; i < 19; i++) {
+      for (let i = 0; i < 21; i++) {
         const td = document.createElement("td");
         if (i === 0) td.textContent = "Location Total";
         else if (i === 1) continue;
@@ -191,7 +207,7 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", addLocationTotals);
+  document.addEventListener("DOMContentLoaded", addLocationTotals); {% endcomment %}
 
   function exportToExcel() {
     const tables = document.querySelectorAll(".location-table");

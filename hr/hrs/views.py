@@ -32,6 +32,10 @@ def add_details(request):
         date_of_joining = request.POST.get("date_of_joining")
         marriage_anniversary_date = request.POST.get("marriage_anniversary_date")
         status = request.POST.get("status")
+        bank_name = request.POST.get("bank_name")
+        bank_account_no = request.POST.get("bank_account_no")
+        ifsc_code = request.POST.get("ifsc_code")
+        epf_no = request.POST.get("epf_no")
         # t = itemno+itemname+itemprice+services+gst+sgst
         try:
             new_employee.objects.update_or_create(employee_id=employee_id,
@@ -48,7 +52,7 @@ def add_details(request):
                                                 date_of_birth=date_of_birth,
                                                 date_of_joining=date_of_joining,
                                                 marriage_anniversary_date=marriage_anniversary_date,
-                                                status=status)
+                                                status=status,bank_name=bank_name,bank_account_no=bank_account_no,ifsc_code=ifsc_code,epf_no=epf_no)
             return render(request,
                           "home/employee_add_details.html",
                           {"msg": "Order Price Details Submit"})

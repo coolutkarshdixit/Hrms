@@ -1,0 +1,273 @@
+{% extends "layouts/base.html" %}
+{% load custom_filters %}
+
+{% block title %}Filtered Payslip Results{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .payslip-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .payslip-header img {
+    height: 150px;
+    margin-right: 10px;
+    float : left;
+  }
+
+  .payslip-header div {
+    text-align: center;
+  }
+
+  .payslip-header div h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .payslip-header div p {
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .table .thead-dark th {
+    color: #fafafa;
+    background-color: rgb(172, 67, 182);
+    border-color: rgb(172, 67, 182);
+    font-size: 12px;
+  }
+
+  .table td {
+    font-size: 11px !important;
+    padding: 4px !important;
+  }
+
+  .payslip-signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+
+  .payslip-signatures div {
+    width: 45%;
+    text-align: center;
+  }
+
+  .payslip-signatures p {
+    margin: 0;
+    font-size: 11px;
+  }
+
+  .filtered-payslip-table {
+    page-break-after: always;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+  }
+
+  .filtered-payslip-table h5 {
+    font-size: 13px;
+    margin: 4px 0;
+  }
+
+  .filtered-payslip-table table {
+    font-size: 12px;
+    margin-bottom: 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Generate Payslips</h4>
+        <p class="card-category">Payslip Details</p>
+      </div>
+      <div class="card-body">
+        <div class="container mt-4">
+          <h5>Payslip Results for {{ selected_month }}/{{ selected_year }}</h5>
+          {% if results %}
+            <div class="text-center mt-4 mb-3">
+              <button class="btn btn-success" onclick="exportFilteredToExcel()">Download All Excel</button>
+              <button class="btn btn-danger" onclick="exportFilteredToPDF()">Download All PDF</button>
+              <button class="btn btn-info" onclick="exportFilteredPayslipsPerEmployee()">Generate Payslip</button>
+            </div>
+
+            {% for item in results %}
+              <div class="filtered-payslip-table mb-3 border rounded">               
+                <div class="payslip-header">
+                  <div style="flex: 1;">
+                    <img src="/static/img/logo.png" alt="Company Logo">
+                  </div>
+                  <div class="company-info" style="flex: 2;">
+                    <h4 class="company-name">Parity Infotech Solutions Pvt. Ltd.</h4>
+                    <p>Payslip for {{ selected_month }}/{{ selected_year }}</p>
+                  </div>
+                  <div style="flex: 1;"></div>
+                </div>
+
+
+                <div class="row">
+                  <div class="col-md-5"><h5><strong>Employee ID:</strong> {{ item.employee.employee_id }}</h5></div>
+                  <div class="col-md-3"><h5><strong>Name:</strong> {{ item.employee.first_name }} {{ item.employee.last_name }}</h5></div>
+                  <div class="col-md-4"><h5><strong>EPF No:</strong> {{ item.employee.epf_no }}</h5></div>
+                </div>
+                <div class="row">
+                  <div class="col-md-5"><h5><strong>Department:</strong> {{ item.employee.department }}</h5></div>
+                  <div class="col-md-3"><h5><strong>Location:</strong> {{ item.employee.location }}</h5></div>
+                  <div class="col-md-4"><h5><strong>Month:</strong> {{ selected_month }}/{{ selected_year }}</h5></div>
+                </div>
+
+                <div class="table-responsive mt-2">
+                  <table class="table table-bordered text-center">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th class="text-left">Component</th>
+                        <th>Salary Details (₹)</th>
+                        <th>Areal Deductions (₹)</th>
+                        <th>Total (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for key, display in component_keys %}
+                      <tr>
+                        <td class="text-left font-weight-bold">{{ display }}</td>
+                        <td>{{ item.salary|get_value:key }}</td>
+                        <td>{{ item.areal|get_value:key }}</td>
+                        <td class="font-weight-bold">{{ item.total|get_value:key }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="row mt-2">
+                  <div class="col-md-6 text-left">
+                    <h4><strong>No. of Payable Days:</strong> {{ item.payable_days }}</h4>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <h4><strong>Net Pay (₹):</strong>
+                    {{ item.total.total }}</h4>
+                  </div>
+                </div>
+
+                <div class="payslip-signatures">
+                  <div><p>______________________</p><p>Employee Signature</p></div>
+                  <div><p>______________________</p><p>HR / Manager Signature</p></div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p>No payslip data found for selected filters.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+  const selectedMonthNum = "{{ selected_month }}";
+  const selectedYear = "{{ selected_year }}";
+  const monthNames = ["", "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  const monthIndex = parseInt(selectedMonthNum, 10);
+  const fileSuffix = `${monthNames[monthIndex]}_${selectedYear}`;
+
+  function exportFilteredToPDF() {
+    const elements = document.querySelectorAll('.filtered-payslip-table');
+    const wrapper = document.createElement('div');
+
+    elements.forEach(el => {
+      const clone = el.cloneNode(true);
+      wrapper.appendChild(clone);
+    });
+
+    const opt = {
+      margin: 0.3,
+      filename: `Payslips_All_${fileSuffix}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(wrapper).save();
+  }
+
+  function exportFilteredPayslipsPerEmployee() {
+    const cards = document.querySelectorAll('.filtered-payslip-table');
+
+    cards.forEach((card, index) => {
+      const wrapper = document.createElement('div');
+      const clone = card.cloneNode(true);
+      clone.style.fontSize = '11px';
+      clone.style.padding = '10px';
+      clone.style.boxSizing = 'border-box';
+      wrapper.appendChild(clone);
+
+      const empIdMatch = card.textContent.match(/Employee ID:\s*(\w+)/);
+      const empId = empIdMatch ? empIdMatch[1] : `Employee_${index + 1}`;
+
+      const opt = {
+        margin: 0.2,
+        filename: `Payslip_${empId}_${fileSuffix}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid'] }
+      };
+
+      html2pdf().set(opt).from(wrapper).save();
+    });
+  }
+
+  function exportFilteredToExcel() {
+    const cards = document.querySelectorAll('.filtered-payslip-table');
+    const wb = XLSX.utils.book_new();
+
+    cards.forEach((card, index) => {
+      const rows = [];
+      const empIdMatch = card.textContent.match(/Employee ID:\s*(\w+)/);
+      const empId = empIdMatch ? empIdMatch[1] : `Employee_${index + 1}`;
+      const nameMatch = card.textContent.match(/Name:\s*(.*?)Location:/);
+      const name = nameMatch ? nameMatch[1].trim() : "";
+      const locMatch = card.textContent.match(/Location:\s*(.*?)Department:/);
+      const loc = locMatch ? locMatch[1].trim() : "";
+
+      rows.push(["Employee ID", empId]);
+      rows.push(["Name", name]);
+      rows.push(["Location", loc]);
+      rows.push(["Month", fileSuffix]);
+
+      const table = card.querySelector("table");
+      if (table) {
+        const headers = Array.from(table.querySelectorAll("thead th")).map(th => th.textContent.trim());
+        rows.push(headers);
+
+        const bodyRows = table.querySelectorAll("tbody tr");
+        bodyRows.forEach(tr => {
+          const cols = Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim());
+          rows.push(cols);
+        });
+      }
+
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, empId);
+    });
+
+    XLSX.writeFile(wb, `Filtered_Payslips_${fileSuffix}.xlsx`);
+  }
+</script>
+{% endblock %}

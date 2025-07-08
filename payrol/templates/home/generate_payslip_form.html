@@ -1,0 +1,111 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Generate Payslip{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Generate Payslip</h4>
+        <p class="card-category">Select filters to generate payslips</p>
+      </div>
+      <div class="card-body">
+        <form method="GET" action="{% url 'filtered_payslip_view' %}">
+          <div class="row">
+
+            <!-- Month -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="month">Select Month</label>
+                <select class="form-control" id="month" name="month" required>
+                  {% for month in months %}
+                    <option value="{{ month }}">{{ month }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Year -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="year">Select Year</label>
+                <select class="form-control" id="year" name="year" required>
+                  {% for year in years %}
+                    <option value="{{ year }}">{{ year }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Employee ID From -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="employee_id_from">Employee ID From</label>
+                <select class="form-control" id="employee_id_from" name="employee_id_from">
+                  <option value="">-- From --</option>
+                  {% for eid in employee_ids %}
+                    <option value="{{ eid }}">{{ eid }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Employee ID To -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="employee_id_to">Employee ID To</label>
+                <select class="form-control" id="employee_id_to" name="employee_id_to">
+                  <option value="">-- To --</option>
+                  {% for eid in employee_ids %}
+                    <option value="{{ eid }}">{{ eid }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Department -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="department">Department (optional)</label>
+                <select class="form-control" id="department" name="department">
+                  <option value="">All</option>
+                  {% for dept in departments %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <!-- Department -->
+            <div class="col-md-2">
+              {% comment %} <div class="form-group">
+                <label for="department">Location</label>
+                <select class="form-control" id="location" name="location">
+                  <option value="">All</option>
+                  {% for loc in locations %}
+                    <option value="{{ loc }}">{{ loc }}</option>
+                  {% endfor %}
+                </select>
+              </div> {% endcomment %}
+            </div>
+            <!-- Location -->
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="location">Location (optional)</label>
+                <select class="form-control" id="location" name="location">
+                  <option value="">All</option>
+                  {% for loc in locations %}
+                    <option value="{{ loc }}">{{ loc }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div>
+          <button type="submit" class="btn btn-primary mt-3">Generate Payslips</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

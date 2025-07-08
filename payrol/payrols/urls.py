@@ -18,7 +18,7 @@ Including another URLconf
 
 from django.urls import path
 from . import views 
-from .views import generate_monthly_salary, generate_monthly_registry_view
+from .views import generate_monthly_salary, generate_monthly_registry_view, generate_payslip_view, filtered_payslip_view, download_payslip_pdf
 
 
 urlpatterns = [
@@ -37,7 +37,19 @@ urlpatterns = [
     path('add_salary', views.add_salary),
    # urls.py
     path("generate-monthly-salary/", views.generate_monthly_salary_view, name="generate_monthly_salary_view"),
-    path("generate-monthly-registry/", generate_monthly_registry_view, name="generate_monthly_registry")
+    path("generate-monthly-registry/", generate_monthly_registry_view, name="generate_monthly_registry"),
+    
+    path("generate-payslip/", generate_payslip_view, name="generate_payslip_screen"),
+    path('generate-payslip/results/', filtered_payslip_view, name='filtered_payslip_view'),
+    path("generate-payslip/download/", views.download_payslip_pdf, name="download_payslip_pdf"),
+
+
+   
+
+
+
+
+
 
     # path('export_report', views.export_report),
 

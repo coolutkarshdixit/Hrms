@@ -44,8 +44,14 @@ class new_employee(models.Model):
     date_of_joining = models.DateField()
     marriage_anniversary_date = models.DateField()
     status = models.CharField(max_length=50)
+    bank_name = models.CharField(max_length=50)
+    bank_account_no = models.CharField(max_length=50)
+    ifsc_code = models.CharField(max_length=50)
+    epf_no = models.CharField(max_length=50)
+    
     
     def __str__(self):
+        
         return self.first_name
 
    

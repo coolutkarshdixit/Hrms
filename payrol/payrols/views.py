@@ -14,8 +14,9 @@ from collections import defaultdict
 from decimal import Decimal
 from django.db.models import Sum
 from decimal import Decimal
-
-
+from datetime import datetime
+from django.http import HttpResponse
+from django.template.loader import get_template
 
 
 
@@ -455,7 +456,6 @@ def index(request):
 #         "grand_total": all_location_totals,
 #     })
 from decimal import Decimal
-from django.shortcuts import render
 from shared_models.models import generate_monthly_salary, generate_monthly_areal_deduction, new_employee
 from collections import defaultdict
 
@@ -471,18 +471,22 @@ def generate_monthly_registry_view(request):
     employee_info = {e.employee_id: e for e in new_employee.objects.all()}
 
     grouped = defaultdict(list)
-    all_location_totals = defaultdict(Decimal)  # Grand total
-    location_totals = defaultdict(lambda: defaultdict(Decimal))  # Per-location totals
+    all_location_totals = defaultdict(Decimal)
 
     keys = [
         "basic_pay", "hra", "travel_allowance", "food_allowance",
         "special_allowance", "car_allowance", "petrol_allowance",
         "driver_allowance", "medical_allowance", "internet_allowance",
         "paper_allowance", "epf", "employer", "employee_recovery",
-        "other_deduction", "total"
+        "other_deduction", "taxes", "total"
     ]
 
     all_employee_ids = set(salary_qs.values_list("employee_id", flat=True)) | set(areal_qs.values_list("employee_id", flat=True))
+
+    location_wise_group = defaultdict(lambda: {
+        "employees": [],
+        "location_total": defaultdict(Decimal)
+    })
 
     for emp_id in all_employee_ids:
         salary = salary_qs.filter(employee_id=emp_id).first()
@@ -498,19 +502,218 @@ def generate_monthly_registry_view(request):
             total_val = val1 + val2
             emp_total[key] = total_val
 
-            # Update grand and location totals
             all_location_totals[key] += total_val
-            location_totals[location][key] += total_val
+            location_wise_group[location]["location_total"][key] += total_val
 
-        grouped[location].append({
+        location_wise_group[location]["employees"].append({
             "employee_id": emp_id,
             "salary": salary,
             "areal": areal,
             "total_row": emp_total
         })
 
+    # Flatten data for template
+    grouped_data = [
+        (location, data["employees"], data["location_total"])
+        for location, data in location_wise_group.items()
+    ]
+
     return render(request, "home/generate_monthly_registry.html", {
-        "grouped_data": grouped.items(),
+        "grouped_data": grouped_data,
         "grand_total": all_location_totals,
-        "location_totals": location_totals,  # Send to template
     })
+
+
+
+
+def generate_payslip_view(request):
+    employee_ids = new_employee.objects.values_list("employee_id", flat=True).distinct()
+    locations = new_employee.objects.values_list("location", flat=True).distinct()
+    departments = new_employee.objects.values_list("department", flat=True).distinct()
+
+    months = [f"{i:02}" for i in range(1, 13)]
+    years = [str(y) for y in range(2024, datetime.now().year + 12)]
+
+    return render(request, "home/generate_payslip_form.html", {
+        "employee_ids": employee_ids,
+        "locations": locations,
+        "departments": departments,
+        "months": months,
+        "years": years,
+    })
+
+
+from django.shortcuts import render
+from decimal import Decimal
+from shared_models.models import (
+    generate_monthly_salary,
+    generate_monthly_areal_deduction,
+    new_employee,
+    add_workday
+)
+from datetime import datetime
+
+def filtered_payslip_view(request):
+    month = request.GET.get('month')
+    year = request.GET.get('year')
+    employee_id_from = request.GET.get('employee_id_from')
+    employee_id_to = request.GET.get('employee_id_to')
+    department = request.GET.get('department')
+    location = request.GET.get('location')
+
+    selected_month = month
+    selected_year = year
+
+    filters = {}
+    if employee_id_from:
+        filters['employee_id__gte'] = employee_id_from
+    if employee_id_to:
+        filters['employee_id__lte'] = employee_id_to
+    if department:
+        filters['department'] = department
+    if location:
+        filters['location'] = location
+
+    employees = new_employee.objects.filter(**filters)
+    results = []
+
+    for emp in employees:
+        employee_id = emp.employee_id
+        month_str = f"{year}-{month.zfill(2)}"  # format 'YYYY-MM'
+
+        # Fetch salary and areal deduction records
+        salary = generate_monthly_salary.objects.filter(employee_id=employee_id, month=month_str).first()
+        areal = generate_monthly_areal_deduction.objects.filter(employee_id=employee_id).first()
+
+        # Convert to dictionaries
+        salary_dict = vars(salary) if salary else {}
+        areal_dict = vars(areal) if areal else {}
+
+        # Clean non-field keys
+        salary_dict = {k: v for k, v in salary_dict.items() if not k.startswith("_")}
+        areal_dict = {k: v for k, v in areal_dict.items() if not k.startswith("_")}
+
+        # Merge salary + areal into total
+        total = {}
+        for key in set(salary_dict.keys()).union(areal_dict.keys()):
+            val1 = salary_dict.get(key, Decimal(0))
+            val2 = areal_dict.get(key, Decimal(0))
+
+            if isinstance(val1, (int, float)):
+                val1 = Decimal(val1)
+            if isinstance(val2, float):
+                val2 = Decimal(str(val2))
+
+            try:
+                total[key] = val1 + val2
+            except:
+                total[key] = val1 or val2  # for strings (e.g., remarks)
+
+        # Get payable days from add_workday
+        workday = add_workday.objects.filter(employee_id=employee_id, month=month_str).first()
+        payable_days = workday.payable_days if workday else None
+
+        results.append({
+            'employee': emp,
+            'salary': salary_dict,
+            'areal': areal_dict,
+            'total': total,
+            'payable_days': payable_days
+        })
+
+    # Define the display order and labels of components
+    component_keys = [
+        ('basic_pay', 'Basic Pay'),
+        ('hra', 'HRA'),
+        ('travel_allowance', 'Travel Allowance'),
+        ('food_allowance', 'Food Allowance'),
+        ('special_allowance', 'Special Allowance'),
+        ('car_allowance', 'Car Allowance'),
+        ('petrol_allowance', 'Petrol Allowance'),
+        ('driver_allowance', 'Driver Allowance'),
+        ('medical_allowance', 'Medical Allowance'),
+        ('internet_allowance', 'Internet Allowance'),
+        ('paper_allowance', 'Paper Allowance'),
+        ('epf', 'EPF'),
+        ('employer', 'Employer'),
+        ('employee_recovery', 'Employee Recovery'),
+        ('other_deduction', 'Other Deduction'),
+        ('taxes', 'Taxes'),
+        ('remark', 'Remark'),
+        ('total', 'Total'),
+    ]
+
+    return render(request, 'home/filtered_payslip_results.html', {
+        'results': results,
+        'selected_month': selected_month,
+        'selected_year': selected_year,
+        'component_keys': component_keys,
+    })
+
+
+# views.py
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from decimal import Decimal
+from shared_models.models import new_employee, generate_monthly_salary, generate_monthly_areal_deduction
+
+@csrf_exempt
+def download_payslip_pdf(request):
+    if request.method == "POST":
+        employee_id = request.POST.get("employee_id")
+        month = request.POST.get("month")
+        year = request.POST.get("year")
+        month_str = f"{year}-{int(month):02d}"
+
+        employee = new_employee.objects.filter(employee_id=employee_id).first()
+        if not employee:
+            return HttpResponse("Employee not found.", status=404)
+
+        salary = generate_monthly_salary.objects.filter(employee_id=employee_id, month=month_str).first()
+        areal = generate_monthly_areal_deduction.objects.filter(employee_id=employee_id).first()
+
+        if not salary:
+            return HttpResponse("Salary data not found.", status=404)
+
+        def safe_decimal(val):
+            try:
+                return Decimal(val or 0)
+            except:
+                return Decimal(0)
+
+        fields = [
+            "basic_pay", "hra", "travel_allowance", "food_allowance",
+            "special_allowance", "car_allowance", "petrol_allowance",
+            "driver_allowance", "medical_allowance", "internet_allowance",
+            "paper_allowance", "epf", "employer", "employee_recovery",
+            "other_deduction", "taxes", "total"
+        ]
+
+        salary_data = {field: safe_decimal(getattr(salary, field, 0)) for field in fields}
+        areal_data = {field: safe_decimal(getattr(areal, field, 0)) for field in fields} if areal else {field: Decimal(0) for field in fields}
+        total_data = {field: salary_data[field] + areal_data[field] for field in fields}
+
+        html = render_to_string("home/payslip_template.html", {
+            "employee": employee,
+            "salary": salary_data,
+            "areal": areal_data,
+            "total": total_data,
+            "month": month_str,
+            "year": year
+        })
+
+        from weasyprint import HTML
+        pdf_file = BytesIO()
+        HTML(string=html).write_pdf(target=pdf_file)
+        pdf_file.seek(0)
+
+        filename = f"payslip_{employee_id}_{month_str}.pdf"
+        response = HttpResponse(pdf_file.read(), content_type="application/pdf")
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+        return response
+
+    return HttpResponse("Invalid request", status=400)

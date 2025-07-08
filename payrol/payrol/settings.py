@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'payrols',
     'shared_models',
+    'payrol',
 ]
 
 # Add CORS settings if necessary
