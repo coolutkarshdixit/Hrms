@@ -1,56 +1,57 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} UI Tables {% endblock %}
-
-<!-- Specific Page CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block title %}Employee List{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header card-header-primary">
-                    <h4 class="card-title">Employee List</h4>
-                    <p class="card-category">Here is all Employees</p>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead class=" text-primary">
-                                <th>Employee Id</th>
-                                <th>Name</th>
-                                <th>Department</th>
-                                <th>Date of Joining</th>
-                                <th>Status</th>
-                                <th>Option</th>
-                            </thead>
-                            <tbody>
-                                {% for i in data %}
-                                <tr>  
-                                    <td>{{ i.employee_id }}</td>
-                                    <td>{{ i.first_name }} {{ i.last_name }}</td>
-                                    <td>{{ i.department }}</td>
-                                    <td class="text-primary">{{ i.date_of_joining }}</td>
-                                    <td class="text-primary">{{ i.status }}</td>
-                                    <td class="text-primary">
-                                        <a href="employee_update_list/" class="btn btn-primary btn-link btn-sm" rel="tooltip" title="Edit Task">
-                                            Edit <i class="material-icons">edit</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-center">No employees found.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Employee List</h4>
+        <p class="card-category">Here are all Employees</p>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Date of Joining</th>
+                <th>Status</th>
+                <th>Option</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in data %}
+              <tr>
+                <td>{{ i.employee_id }}</td>
+                <td>{{ i.first_name }} {{ i.last_name }}</td>
+                <td>{{ i.department }}</td>
+                <td class="text-primary">{{ i.date_of_joining }}</td>
+                <td class="text-primary">{{ i.status }}</td>
+                <td class="text-primary" style="position: relative; z-index: 10;">
+                    <a href="{% url 'edit_employee' i.employee_id %}"
+                        class="btn btn-primary btn-link btn-sm"
+                        rel="tooltip" title="Edit"
+                        style="pointer-events: auto; z-index: 100; position: relative;">
+                        <i class="material-icons">edit</i>
+                    </a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center">No employees found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
+  </div>
+</div>
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE -->
 {% block javascripts %}{% endblock javascripts %}

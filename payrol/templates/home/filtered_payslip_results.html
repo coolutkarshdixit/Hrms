@@ -90,7 +90,7 @@
       </div>
       <div class="card-body">
         <div class="container mt-4">
-          <h5>Payslip Results for {{ selected_month }}/{{ selected_year }}</h5>
+          <h5>Payslip Results for {{ selected_month }}</h5>
           {% if results %}
             <div class="text-center mt-4 mb-3">
               <button class="btn btn-success" onclick="exportFilteredToExcel()">Download All Excel</button>
@@ -106,7 +106,7 @@
                   </div>
                   <div class="company-info" style="flex: 2;">
                     <h4 class="company-name">Parity Infotech Solutions Pvt. Ltd.</h4>
-                    <p>Payslip for {{ selected_month }}/{{ selected_year }}</p>
+                    <p>Payslip for {{ selected_month }}</p>
                   </div>
                   <div style="flex: 1;"></div>
                 </div>
@@ -120,7 +120,8 @@
                 <div class="row">
                   <div class="col-md-5"><h5><strong>Department:</strong> {{ item.employee.department }}</h5></div>
                   <div class="col-md-3"><h5><strong>Location:</strong> {{ item.employee.location }}</h5></div>
-                  <div class="col-md-4"><h5><strong>Month:</strong> {{ selected_month }}/{{ selected_year }}</h5></div>
+                  <div class="col-md-4"><h5><strong>Month:</strong> {{ selected_month }}</h5>
+                </div>
                 </div>
 
                 <div class="table-responsive mt-2">
@@ -183,7 +184,8 @@
   const monthNames = ["", "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
   const monthIndex = parseInt(selectedMonthNum, 10);
-  const fileSuffix = `${monthNames[monthIndex]}_${selectedYear}`;
+  const fileSuffix = "{{ selected_month }}";
+
 
   function exportFilteredToPDF() {
     const elements = document.querySelectorAll('.filtered-payslip-table');

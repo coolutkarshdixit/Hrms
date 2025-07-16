@@ -1,0 +1,176 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Edit Employee{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Edit Employee Profile</h4>
+        <p class="card-category">Update employee information</p>
+      </div>
+      <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label class="bmd-label-floating">Employee Id</label>
+                <input type="text" class="form-control" name="employee_id" value="{{ employee.employee_id }}" readonly>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="bmd-label-floating">First Name</label>
+                <input type="text" class="form-control" name="first_name" value="{{ employee.first_name }}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Last Name</label>
+                <input type="text" class="form-control" name="last_name" value="{{ employee.last_name }}">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Department</label>
+                <select class="form-control" name="department">
+                  <option value="Bid" {% if employee.department == "Bid" %}selected{% endif %}>Bid</option>
+                  <option value="Sales" {% if employee.department == "Sales" %}selected{% endif %}>Sales</option>
+                  <option value="Presales" {% if employee.department == "Presales" %}selected{% endif %}>Presales</option>
+                  <option value="Accounts" {% if employee.department == "Accounts" %}selected{% endif %}>Accounts</option>
+                  <option value="Development" {% if employee.department == "Development" %}selected{% endif %}>Development</option>
+                  <option value="Cafex" {% if employee.department == "Cafex" %}selected{% endif %}>Cafex</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Location</label>
+                <select class="form-control" name="location">
+                  <option value="Delhi" {% if employee.location == "Delhi" %}selected{% endif %}>Delhi</option>
+                  <option value="Chandigarh" {% if employee.location == "Chandigarh" %}selected{% endif %}>Chandigarh</option>
+                  <option value="Bangalore" {% if employee.location == "Bangalore" %}selected{% endif %}>Bangalore</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Father Name</label>
+                <input type="text" class="form-control" name="father_name" value="{{ employee.father_name }}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Mother Name</label>
+                <input type="text" class="form-control" name="mother_name" value="{{ employee.mother_name }}">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="bmd-label-floating">Wife Name</label>
+                <input type="text" class="form-control" name="wife_name" value="{{ employee.wife_name }}">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Current Address</label>
+                <input type="text" class="form-control" name="current_address" value="{{ employee.current_address }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Permanent Address</label>
+                <input type="text" class="form-control" name="permanent_address" value="{{ employee.permanent_address }}">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Number of Kids</label>
+                <input type="number" class="form-control" name="no_of_kids" value="{{ employee.no_of_kids }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="bmd-label-floating" style="margin-left:95px">Date of Birth</label>
+              <input type="date" class="form-control" name="date_of_birth" value="{{ employee.date_of_birth|date:'Y-m-d' }}">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <label class="bmd-label-floating" style="margin-left:95px">Date of Joining</label>
+              <input type="date" class="form-control" name="date_of_joining" value="{{ employee.date_of_joining|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="bmd-label-floating" style="margin-left:95px">Marriage Anniversary Date</label>
+              <input type="date" class="form-control" name="marriage_anniversary_date" value="{{ employee.marriage_anniversary_date|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="bmd-label-floating">Status</label>
+              <select class="form-control" name="status">
+                <option value="Active" {% if employee.status == "Active" %}selected{% endif %}>Active</option>
+                <option value="Deactive" {% if employee.status == "Deactive" %}selected{% endif %}>Deactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="text-align:center">
+            <h4>Account Details</h4>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Bank Name</label>
+                <input type="text" class="form-control" name="bank_name" value="{{ employee.bank_name }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Bank Account No</label>
+                <input type="number" class="form-control" name="bank_account_no" value="{{ employee.bank_account_no }}">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">IFSC Code</label>
+                <input type="text" class="form-control" name="ifsc_code" value="{{ employee.ifsc_code }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">EPF No</label>
+                <input type="number" class="form-control" name="epf_no" value="{{ employee.epf_no }}">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary pull-right">Update</button>
+          <button type="reset" class="btn btn-secondary pull-right">Cancel</button>
+          <div class="clearfix"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<!-- Optional custom JS -->
+{% endblock %}

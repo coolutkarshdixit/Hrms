@@ -1,0 +1,119 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Edit Salary{% endblock %}
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Edit Salary</h4>
+        <p class="card-category">Update Employee Salary Details</p>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="bmd-label-floating">Employee ID</label>
+                <input type="text" class="form-control" name="employee_id" value="{{ salary.employee_id }}" readonly>
+              </div>
+            </div>
+          </div>
+
+          <!-- Allowances -->
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Basic Pay</label><input type="number" class="form-control" name="basic_pay" id="basic_pay" value="{{ salary.basic_pay }}"></div></div>
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">HRA</label><input type="number" class="form-control" name="hra" id="hra" value="{{ salary.hra }}"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Travel Allowance</label><input type="number" class="form-control" name="travel_allowance" id="travel_allowance" value="{{ salary.travel_allowance }}"></div></div>
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Food Allowance</label><input type="number" class="form-control" name="food_allowance" id="food_allowance" value="{{ salary.food_allowance }}"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Special Allowance</label><input type="number" class="form-control" name="special_allowance" id="special_allowance" value="{{ salary.special_allowance }}"></div></div>
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Car Allowance</label><input type="number" class="form-control" name="car_allowance" id="car_allowance" value="{{ salary.car_allowance }}"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Petrol Allowance</label><input type="number" class="form-control" name="petrol_allowance" id="petrol_allowance" value="{{ salary.petrol_allowance }}"></div></div>
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Driver Allowance</label><input type="number" class="form-control" name="driver_allowance" id="driver_allowance" value="{{ salary.driver_allowance }}"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Medical Allowance</label><input type="number" class="form-control" name="medical_allowance" id="medical_allowance" value="{{ salary.medical_allowance }}"></div></div>
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Internet Allowance</label><input type="number" class="form-control" name="internet_allowance" id="internet_allowance" value="{{ salary.internet_allowance }}"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Paper Allowance</label><input type="number" class="form-control" name="paper_allowance" id="paper_allowance" value="{{ salary.paper_allowance }}"></div></div>
+          </div>
+
+          <!-- Deduction Section -->
+          <div style="text-align:center">
+            <h4>Deduction</h4>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">EPF</label><input type="number" class="form-control" name="epf" id="epf" value="{{ salary.epf }}"></div></div>
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Employer</label><input type="number" class="form-control" name="employer" id="employer" value="{{ salary.employer }}"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Employee Recovery</label><input type="number" class="form-control" name="employee_recovery" id="employee_recovery" value="{{ salary.employee_recovery }}"></div></div>
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Other Deduction</label><input type="number" class="form-control" name="other_deduction" id="other_deduction" value="{{ salary.other_deduction }}"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Taxes</label><input type="number" class="form-control" name="taxes" id="taxes" value="{{ salary.taxes }}"></div></div>
+            <div class="col-md-6"><div class="form-group"><label class="bmd-label-floating">Remark</label><input type="text" class="form-control" name="remark" id="remark" value="{{ salary.remark }}"></div></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 offset-md-6"><div class="form-group"><label class="bmd-label-floating">Total</label><input type="number" class="form-control" name="total" id="net_salary" value="{{ salary.total }}"></div></div>
+          </div>
+
+          <div class="button">
+            <button type="submit" class="btn btn-primary pull-right">Update</button>
+          </div>
+          <div class="clearfix"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fields = [
+      "basic_pay", "hra", "travel_allowance", "food_allowance", "special_allowance",
+      "car_allowance", "petrol_allowance", "driver_allowance", "medical_allowance",
+      "internet_allowance", "paper_allowance", "epf", "employer", "employee_recovery",
+      "other_deduction", "taxes"
+    ];
+
+    function calculateTotal() {
+      let total = 0;
+      fields.forEach(field => {
+        const val = parseFloat(document.getElementById(field).value) || 0;
+        total += val;
+      });
+      document.getElementById("net_salary").value = total.toFixed(2);
+    }
+
+    fields.forEach(field => {
+      const el = document.getElementById(field);
+      if (el) {
+        el.addEventListener("input", calculateTotal);
+      }
+    });
+  });
+</script>
+{% endblock javascripts %}

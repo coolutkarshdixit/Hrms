@@ -542,7 +542,6 @@ def generate_payslip_view(request):
         "years": years,
     })
 
-
 from django.shortcuts import render
 from decimal import Decimal
 from shared_models.models import (
@@ -551,18 +550,13 @@ from shared_models.models import (
     new_employee,
     add_workday
 )
-from datetime import datetime
 
 def filtered_payslip_view(request):
-    month = request.GET.get('month')
-    year = request.GET.get('year')
+    selected_month = request.GET.get('month')  # Expecting 'YYYY-MM'
     employee_id_from = request.GET.get('employee_id_from')
     employee_id_to = request.GET.get('employee_id_to')
     department = request.GET.get('department')
     location = request.GET.get('location')
-
-    selected_month = month
-    selected_year = year
 
     filters = {}
     if employee_id_from:
@@ -579,21 +573,17 @@ def filtered_payslip_view(request):
 
     for emp in employees:
         employee_id = emp.employee_id
-        month_str = f"{year}-{month.zfill(2)}"  # format 'YYYY-MM'
 
-        # Fetch salary and areal deduction records
-        salary = generate_monthly_salary.objects.filter(employee_id=employee_id, month=month_str).first()
+        # Salary for the given month must exist
+        salary = generate_monthly_salary.objects.filter(employee_id=employee_id, month=selected_month).first()
+        if not salary:
+            continue
+
         areal = generate_monthly_areal_deduction.objects.filter(employee_id=employee_id).first()
 
-        # Convert to dictionaries
-        salary_dict = vars(salary) if salary else {}
-        areal_dict = vars(areal) if areal else {}
+        salary_dict = {k: v for k, v in vars(salary).items() if not k.startswith("_")}
+        areal_dict = {k: v for k, v in vars(areal).items() if not k.startswith("_")} if areal else {}
 
-        # Clean non-field keys
-        salary_dict = {k: v for k, v in salary_dict.items() if not k.startswith("_")}
-        areal_dict = {k: v for k, v in areal_dict.items() if not k.startswith("_")}
-
-        # Merge salary + areal into total
         total = {}
         for key in set(salary_dict.keys()).union(areal_dict.keys()):
             val1 = salary_dict.get(key, Decimal(0))
@@ -607,10 +597,9 @@ def filtered_payslip_view(request):
             try:
                 total[key] = val1 + val2
             except:
-                total[key] = val1 or val2  # for strings (e.g., remarks)
+                total[key] = val1 or val2
 
-        # Get payable days from add_workday
-        workday = add_workday.objects.filter(employee_id=employee_id, month=month_str).first()
+        workday = add_workday.objects.filter(employee_id=employee_id, month=selected_month).first()
         payable_days = workday.payable_days if workday else None
 
         results.append({
@@ -621,7 +610,6 @@ def filtered_payslip_view(request):
             'payable_days': payable_days
         })
 
-    # Define the display order and labels of components
     component_keys = [
         ('basic_pay', 'Basic Pay'),
         ('hra', 'HRA'),
@@ -646,7 +634,6 @@ def filtered_payslip_view(request):
     return render(request, 'home/filtered_payslip_results.html', {
         'results': results,
         'selected_month': selected_month,
-        'selected_year': selected_year,
         'component_keys': component_keys,
     })
 

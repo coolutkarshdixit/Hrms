@@ -86,17 +86,53 @@ def add_details(request):
 #             return render(request,"home/employee_add_details.html",
 #                           {"msg": "Details Already Submit"})
 
+from django.shortcuts import render
+from shared_models.models import new_employee
+
 def employee_list(request):
-    # email = request.session['email']
-    r = new_employee.objects.all()
-    return render(request, "home/employee_list.html",
-                  {'data': r})
+    employees = new_employee.objects.exclude(employee_id__isnull=True).exclude(employee_id__exact="")
+
+    # Ensure clean, URL-safe employee_ids
+    for emp in employees:
+        if emp.employee_id:
+            emp.employee_id = emp.employee_id.strip().replace(" ", "").replace("\u200b", "")
+
+    return render(request, "home/employee_list.html", {'data': employees})
+
+
+
+def edit_employee(request, employee_id):
+    employee = get_object_or_404(new_employee, employee_id=employee_id)
+    if request.method == "POST":
+        employee.first_name = request.POST.get('first_name')
+        employee.last_name = request.POST.get('last_name')
+        employee.department = request.POST.get('department')
+        employee.location = request.POST.get('location')
+        employee.father_name = request.POST.get('father_name')
+        employee.mother_name = request.POST.get('mother_name')
+        employee.wife_name = request.POST.get('wife_name')
+        employee.current_address = request.POST.get('current_address')
+        employee.permanent_address = request.POST.get('permanent_address')
+        employee.no_of_kids = request.POST.get('no_of_kids')
+        employee.date_of_birth = request.POST.get('date_of_birth')
+        employee.date_of_joining = request.POST.get('date_of_joining')
+        employee.marriage_anniversary_date = request.POST.get('marriage_anniversary_date')
+        employee.status = request.POST.get('status')
+        employee.bank_name = request.POST.get('bank_name')
+        employee.bank_account_no = request.POST.get('bank_account_no')
+        employee.ifsc_code = request.POST.get('ifsc_code')
+        employee.epf_no = request.POST.get('epf_no')
+        employee.save()
+        return redirect('employee_list')  # this will now work after fixing urls.py
+    return render(request, "home/edit_employee.html", {'employee': employee})
 
 def employee_details(request):
     # email = request.session['email']
     r = new_employee.objects.all()
     return render(request, "home/employee_list.html",
                   {'data': r})
+
+
     
 # def employee_details(request):
 #     template_name = "employeedetails.html"
@@ -208,18 +244,68 @@ def add_salary(request):
             return render(request,
                          "home/create_salary_details.html",
                           {"msg": "Order Price Details Already Added !!"})
+            
+from django.shortcuts import render, get_object_or_404, redirect
+from shared_models.models import salary_add, new_employee
+
+# Show salary list
 def salary_details_list(request):
-    r = salary_add.objects.all()
-    return render(request,"home/salary_details_list.html",
-                  {'data': r})
+    salary_records = salary_add.objects.all()
+    data = []
+
+    for record in salary_records:
+        emp = new_employee.objects.filter(employee_id=record.employee_id).first()
+        data.append({
+            'employee_id': record.employee_id,
+            'first_name': emp.first_name if emp else '',
+            'last_name': emp.last_name if emp else '',
+            'department': emp.department if emp else '',
+            'date_of_joining': emp.date_of_joining if emp else '',
+            'status': emp.status if emp else '',
+        })
+
+    return render(request, "home/salary_details_list.html", {'data': data})
+
+
+# Edit salary details for employee
+def edit_salary_add(request, employee_id):
+    salary = get_object_or_404(salary_add, employee_id=employee_id)
+
+    if request.method == "POST":
+        salary.basic_pay = request.POST.get('basic_pay')
+        salary.hra = request.POST.get('hra')
+        salary.travel_allowance = request.POST.get('travel_allowance')
+        salary.food_allowance = request.POST.get('food_allowance')
+        salary.special_allowance = request.POST.get('special_allowance')
+        salary.save()
+        return redirect('salary_details_list')
+
+    return render(request, "home/edit_salary_add.html", {'salary': salary})
+
+
+
+
             
 # def salary_details_list(request):
 #     return render(request,"home/salary_details_list.html")
 
 def salary_increment_details(request):
-    r = salary_add.objects.all()
-    return render(request,"home/salary_increment_details.html",
-                  {'data': r})
+    salary_records = salary_add.objects.all()
+    data = []
+
+    for record in salary_records:
+        emp = new_employee.objects.filter(employee_id=record.employee_id).first()
+        data.append({
+            'employee_id': record.employee_id,
+            'first_name': emp.first_name if emp else '',
+            'last_name': emp.last_name if emp else '',
+            'department': emp.department if emp else '',
+            'date_of_joining': emp.date_of_joining if emp else '',
+            'status': emp.status if emp else '',
+        })
+
+    return render(request, "home/salary_increment_details.html", {'data': data})
+
 
 # def salary_increment_details(request):
 #     return render(request,"home/salary_increment_details.html")

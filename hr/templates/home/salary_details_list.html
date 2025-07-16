@@ -1,56 +1,59 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} UI Tables {% endblock %}
-
-<!-- Specific Page CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block title %}Salary Details List{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header card-header-primary">
-                    <h4 class="card-title">Salary Details List</h4>
-                    <p class="card-category">Here is all Details</p>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead class=" text-primary">
-                                <th>Employee Id</th>
-                                <th>Name</th>
-                                <th>Department</th>
-                                <th>Date of Joining</th>
-                                <th>Status</th>
-                                <th>Option</th>
-                            </thead>
-                            <tbody>
-                                {% for i in data %}
-                                <tr>  
-                                    <td>{{ i.employee_id }}</td>
-                                    <td>{{ i.first_name }} {{ i.last_name }}</td>
-                                    <td>{{ i.department }}</td>
-                                    <td class="text-primary">{{ i.start_date }}</td>
-                                    <td class="text-primary">{{ i.status }}</td>
-                                    <td class="text-primary">
-                                        <a href="" class="btn btn-primary btn-link btn-sm" rel="tooltip" title="Edit Task">
-                                            Edit <i class="material-icons">edit</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-center">No details found.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary">
+        <h4 class="card-title">Salary Details List</h4>
+        <p class="card-category">Here is all Details</p>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="text-primary">
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Date of Joining</th>
+                <th>Status</th>
+                <th>Option</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in data %}
+              <tr>
+                <td>{{ i.employee_id|default:"N/A" }}</td>
+                <td>{{ i.first_name|default:"" }} {{ i.last_name|default:"" }}</td>
+                <td>{{ i.department|default:"N/A" }}</td>
+                <td>{{ i.date_of_joining|default:"N/A" }}</td>
+                <td>{{ i.status|default:"N/A" }}</td>
+                <td style="position: relative; z-index: 10;">
+                  {% if i.employee_id %}
+                  <a href="{% url 'edit_salary_add' i.employee_id %}"
+                     class="btn btn-primary btn-link btn-sm"
+                     rel="tooltip" title="Edit"
+                     style="pointer-events: auto; z-index: 100; position: relative;">
+                    <i class="material-icons">edit</i>
+                  </a>
+                  {% else %}
+                  <span class="text-muted">N/A</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center">No details found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
-{% endblock content %}
-
-<!-- Specific Page JS goes HERE -->
-{% block javascripts %}{% endblock javascripts %}
+  </div>
+</div>
+{% endblock %}
